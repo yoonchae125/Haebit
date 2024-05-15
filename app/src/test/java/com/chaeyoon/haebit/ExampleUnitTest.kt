@@ -1,4 +1,4 @@
-package com.example.haebit
+package com.chaeyoon.haebit
 
 import org.junit.Test
 
