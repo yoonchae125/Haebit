@@ -37,11 +37,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class CameraImpl(
-    context: Context,
-    private val outView: AutoFitSurfaceView,
-    private val onCameraOpenFailed: () -> Unit
-) : Camera {
+class CameraImpl(context: Context) : Camera {
     // camera values
     private var mutableAperture = 0f
     private val isoMutableFlow = MutableStateFlow<Int>(0)
@@ -60,8 +56,12 @@ class CameraImpl(
     private lateinit var cameraId: String
     private val cameraThread = HandlerThread("CameraThread").apply { start() }
     private val cameraHandler = Handler(cameraThread.looper)
+    private var outView: AutoFitSurfaceView? = null
+    private lateinit var onCameraOpenFailed: () -> Unit
 
-    init {
+    override fun setOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit) {
+        this.outView = outView
+        this.onCameraOpenFailed = onCameraOpenFailed
         getCameraId()?.let { cameraId = it } ?: run { onCameraOpenFailed() }
 
         val characteristics = cameraManager.getCameraCharacteristics(cameraId)
@@ -92,25 +92,27 @@ class CameraImpl(
         })
     }
 
+
     override fun startCamera(coroutineScope: CoroutineScope) {
-        outView.rootView.post {
+        outView?.rootView?.post {
             internalStartCamera(coroutineScope)
         }
     }
 
     private fun internalStartCamera(coroutineScope: CoroutineScope) =
         coroutineScope.launch(Dispatchers.Main) {
+            val nonNullView = requireNotNull(outView)
             val camera = openCamera(cameraId, onCameraOpenFailed)
 
             // Creates list of Surfaces where the camera will output frames
-            val targets = listOf(outView.holder.surface)
+            val targets = listOf(nonNullView.holder.surface)
 
             // Start a capture session using our open camera and list of Surfaces where frames will go
             val session = createCaptureSession(camera, targets)
 
             val captureRequestBuilder = camera.createCaptureRequest(
                 CameraDevice.TEMPLATE_PREVIEW
-            ).apply { addTarget(outView.holder.surface) }
+            ).apply { addTarget(nonNullView.holder.surface) }
 
             mutableAperture = captureRequestBuilder.get(CaptureRequest.LENS_APERTURE)!!
 

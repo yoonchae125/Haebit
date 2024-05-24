@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
 import com.chaeyoon.haebit.obscura.core.Camera
 import com.chaeyoon.haebit.obscura.core.CameraImpl
+import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
 
 /**
@@ -20,10 +23,15 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var permissionChecker: PermissionChecker
-    private val camera: Camera by lazy {
-        CameraImpl(requireContext(), binding.cameraPreview, ::onCameraOpenFailed)
+    private val viewModel: CameraFragmentViewModel by lazy {
+        ViewModelProvider(
+            requireActivity(),
+            CameraFragmentViewModel.Factory(requireContext())
+        ).get()
     }
+
+    private lateinit var permissionChecker: PermissionChecker
+    private val camera: Camera by lazy { CameraImpl(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +48,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        camera.startCamera(lifecycleScope)
+        viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
+        viewModel.startCamera(lifecycleScope)
     }
 
     private fun onCameraOpenFailed() {
