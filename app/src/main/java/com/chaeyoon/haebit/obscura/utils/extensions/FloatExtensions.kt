@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.lightmeter.extensions
+package com.chaeyoon.haebit.obscura.utils.extensions
 
 internal fun Float.nearest(among: List<Float>): Float {
     return among.minByOrNull { kotlin.math.abs(it - this) } ?: this

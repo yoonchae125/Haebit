@@ -22,7 +22,7 @@ import android.view.SurfaceHolder
 import com.chaeyoon.haebit.lightmeter.LightMeterCalculator
 import com.chaeyoon.haebit.lightmeter.functions.nanoSecondsToSeconds
 import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
-import com.chaeyoon.haebit.utils.functions.getPreviewOutputSize
+import com.chaeyoon.haebit.obscura.utils.functions.getPreviewOutputSize
 import com.google.android.gms.common.util.concurrent.HandlerExecutor
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope

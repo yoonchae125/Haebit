@@ -1,6 +1,6 @@
 package com.chaeyoon.haebit.lightmeter
 
-import com.chaeyoon.haebit.lightmeter.extensions.nearest
+import com.chaeyoon.haebit.obscura.utils.extensions.nearest
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import kotlin.math.roundToInt

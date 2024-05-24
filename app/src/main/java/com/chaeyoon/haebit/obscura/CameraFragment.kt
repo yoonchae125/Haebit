@@ -14,6 +14,8 @@ import com.chaeyoon.haebit.obscura.core.Camera
 import com.chaeyoon.haebit.obscura.core.CameraImpl
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
+import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
+import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
 
 /**
  * CameraFragment
@@ -50,10 +52,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
         viewModel.startCamera(lifecycleScope)
-    }
 
-    private fun onCameraOpenFailed() {
-        requireActivity().finish()
+        collectViewModel()
     }
 
     override fun onStart() {
@@ -69,6 +69,20 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private fun initPermissionChecker() {
         permissionChecker = PermissionChecker(this)
     }
+
+    private fun onCameraOpenFailed() {
+        requireActivity().finish()
+    }
+
+    private fun collectViewModel() {
+        viewLifecycleOwner.launchAndRepeatOnLifecycle {
+            viewModel.exposureValueFlow.collect {
+                binding.exposureValueText.text = it.toEVTextFormat()
+            }
+        }
+    }
+
+    private fun Float.toEVTextFormat(): String = "EV ${toTwoDecimalPlaces()}"
 
     companion object {
         private val TAG = CameraFragment::class.java.simpleName
