@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.chaeyoon.haebit.utils.CameraPermissionDeniedAlertDialog
+import com.chaeyoon.haebit.obscura.utils.CameraPermissionDeniedAlertDialog
 
 class PermissionChecker(fragment: Fragment) {
     private val context = fragment.requireContext()

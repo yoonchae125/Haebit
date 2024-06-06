@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.utils.functions
+package com.chaeyoon.haebit.obscura.utils.functions
 
 import android.annotation.SuppressLint
 import android.graphics.Point

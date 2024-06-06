@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CameraValueItemStyle">
+        <item name="android:layout_width">@dimen/camera_value_item_width</item>
+        <item name="android:layout_height">@dimen/camera_value_item_height</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
