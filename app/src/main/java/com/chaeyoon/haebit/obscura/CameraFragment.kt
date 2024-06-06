@@ -10,12 +10,15 @@ import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
-import com.chaeyoon.haebit.obscura.core.Camera
-import com.chaeyoon.haebit.obscura.core.CameraImpl
-import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
-import com.chaeyoon.haebit.permission.PermissionChecker
+import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
+import com.chaeyoon.haebit.obscura.utils.constants.isoValues
+import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
+import com.chaeyoon.haebit.obscura.view.CameraValueListAdapter
+import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
+import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
+import com.chaeyoon.haebit.permission.PermissionChecker
 
 /**
  * CameraFragment
@@ -27,13 +30,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private val viewModel: CameraFragmentViewModel by lazy {
         ViewModelProvider(
-            requireActivity(),
+            this,
             CameraFragmentViewModel.Factory(requireContext())
         ).get()
     }
 
     private lateinit var permissionChecker: PermissionChecker
-    private val camera: Camera by lazy { CameraImpl(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +51,25 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        CameraValueListBinder(
+            requireContext(),
+            binding.apertureList,
+            apertureValues,
+            CameraValueListAdapter.Type.APERTURE
+        )
+        CameraValueListBinder(
+            requireContext(),
+            binding.shutterSpeedList,
+            shutterSpeedValues,
+            CameraValueListAdapter.Type.SHUTTER_SPEED
+        )
+        CameraValueListBinder(
+            requireContext(),
+            binding.isoList,
+            isoValues,
+            CameraValueListAdapter.Type.ISO
+        )
 
         viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
         viewModel.startCamera(lifecycleScope)
@@ -88,3 +109,4 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         private val TAG = CameraFragment::class.java.simpleName
     }
 }
+

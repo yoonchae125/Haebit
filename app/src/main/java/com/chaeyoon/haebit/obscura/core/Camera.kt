@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface Camera {
     val aperture: Float
-    val isoFlow: StateFlow<Int>
+    val isoFlow: StateFlow<Float>
     val shutterSpeedFlow: StateFlow<Float>
     val exposureValueFlow: StateFlow<Float>
 

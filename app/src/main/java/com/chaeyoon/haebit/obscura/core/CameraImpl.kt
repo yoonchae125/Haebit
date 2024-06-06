@@ -40,12 +40,12 @@ import kotlin.coroutines.suspendCoroutine
 class CameraImpl(context: Context) : Camera {
     // camera values
     private var mutableAperture = 0f
-    private val isoMutableFlow = MutableStateFlow<Int>(0)
+    private val isoMutableFlow = MutableStateFlow<Float>(0f)
     private val shutterSpeedMutableFlow = MutableStateFlow<Float>(0f)
     private val exposureValueMutableFlow = MutableStateFlow<Float>(0f)
     override val aperture: Float
         get() = mutableAperture
-    override val isoFlow: StateFlow<Int> = isoMutableFlow.asStateFlow()
+    override val isoFlow: StateFlow<Float> = isoMutableFlow.asStateFlow()
     override val shutterSpeedFlow: StateFlow<Float> = shutterSpeedMutableFlow.asStateFlow()
     override val exposureValueFlow: StateFlow<Float> = exposureValueMutableFlow.asStateFlow()
     private val lightMeterCalculator = LightMeterCalculator()
@@ -138,7 +138,7 @@ class CameraImpl(context: Context) : Camera {
         val exposureValue =
             lightMeterCalculator.calculateExposureValue(aperture, shutterSpeed, iso.toFloat())
 
-        isoMutableFlow.update { iso }
+        isoMutableFlow.update { iso.toFloat() }
         shutterSpeedMutableFlow.update { shutterSpeed }
         exposureValueMutableFlow.update { exposureValue }
 
