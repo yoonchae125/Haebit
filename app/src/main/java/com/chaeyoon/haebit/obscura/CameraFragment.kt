@@ -17,7 +17,7 @@ import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
-import com.chaeyoon.haebit.obscura.view.CameraValueType
+import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
 

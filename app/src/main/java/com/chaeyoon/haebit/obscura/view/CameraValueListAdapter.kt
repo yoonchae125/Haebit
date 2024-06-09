@@ -14,6 +14,9 @@ import com.chaeyoon.haebit.databinding.ViewCameraValueItemBinding
 import com.chaeyoon.haebit.databinding.ViewShutterSpeedItemBinding
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedStringValues
 import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
+import com.chaeyoon.haebit.obscura.view.model.CameraValueType
+import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
+import com.chaeyoon.haebit.obscura.view.model.DIFF_CALLBACK
 
 /**
  * CameraValueListAdapter is a RecyclerView adapter designed to display a list of camera values
@@ -76,6 +79,12 @@ class CameraValueListAdapter(
             context.resources.getColor(R.color.white, null)
         }
 
+    private fun Context.getTypeface(@FontRes resId: Int, path: String) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            resources.getFont(resId)
+        } else {
+            Typeface.createFromAsset(resources.assets, path)
+        }
 
     inner class ApertureViewHolder(
         private val binding: ViewCameraValueItemBinding
@@ -97,13 +106,6 @@ class CameraValueListAdapter(
 
         private fun format(value: Float) = "ƒ${value.toOneDecimalPlaces()}"
     }
-
-    private fun Context.getTypeface(@FontRes resId: Int, path: String) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            resources.getFont(resId)
-        } else {
-            Typeface.createFromAsset(resources.assets, path)
-        }
 
     inner class ShutterSpeedViewHolder(
         private val binding: ViewShutterSpeedItemBinding

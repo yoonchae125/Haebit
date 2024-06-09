@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view
+package com.chaeyoon.haebit.obscura.view.model
 
 import androidx.recyclerview.widget.DiffUtil
 

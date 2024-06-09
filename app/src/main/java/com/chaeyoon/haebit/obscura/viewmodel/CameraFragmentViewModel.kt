@@ -10,7 +10,7 @@ import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.nearest
 import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
-import com.chaeyoon.haebit.obscura.view.CameraValueType
+import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
