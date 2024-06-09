@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 internal inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
@@ -15,5 +16,14 @@ internal inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
         lifecycle.repeatOnLifecycle(state) {
             block()
         }
+    }
+}
+
+inline fun <T> Flow<T>.launchAndCollect(
+    coroutineScope: CoroutineScope,
+    crossinline block: suspend (T) -> Unit
+) = coroutineScope.launch {
+    collect {
+        block(it)
     }
 }

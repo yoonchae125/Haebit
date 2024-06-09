@@ -8,11 +8,11 @@
     <TextView
         android:id="@+id/value_text"
         style="@style/CameraValueItemStyle"
+        android:fontFamily="@font/frank_ruhl_libre_extra_bold"
         android:textSize="@dimen/camera_shutter_speed_item_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:fontFamily="@font/frank_ruhl_libre_extra_bold"
         app:layout_constraintTop_toTopOf="parent"
         tools:background="@color/black"
         tools:text="¹⁄8000s" />

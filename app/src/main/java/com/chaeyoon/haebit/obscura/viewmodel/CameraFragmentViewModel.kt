@@ -10,6 +10,7 @@ import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.nearest
 import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
+import com.chaeyoon.haebit.obscura.view.CameraValueType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,8 +38,12 @@ class CameraFragmentViewModel(private val camera: Camera) : ViewModel() {
     val userApertureFlow: StateFlow<Float> = userApertureMutableFlow.asStateFlow()
 
 
-    private val cameraValueTextMutableFlow = MutableStateFlow(shutterSpeedFlow.value.toString())
-    private val cameraValueTextFlow: StateFlow<String> = cameraValueTextMutableFlow.asStateFlow()
+    private val cameraValueTextMutableFlow = MutableStateFlow(isoFlow.value.toString())
+    val cameraValueTextFlow: StateFlow<String> = cameraValueTextMutableFlow.asStateFlow()
+
+    private val unSelectableValueTypeMutableFlow = MutableStateFlow(CameraValueType.ISO)
+    val unSelectableValueTypeFlow: StateFlow<CameraValueType> =
+        unSelectableValueTypeMutableFlow.asStateFlow()
 
     fun setCameraOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit) {
         camera.setOutView(outView, onCameraOpenFailed)
@@ -48,8 +53,27 @@ class CameraFragmentViewModel(private val camera: Camera) : ViewModel() {
         camera.startCamera(coroutineScope)
     }
 
-    fun updateCameraValue(value:String){
+    fun getUserCameraValueFlow(type: CameraValueType): StateFlow<Float> =
+        when (type) {
+            CameraValueType.APERTURE -> userApertureFlow
+            CameraValueType.ISO -> userIsoFlow
+            CameraValueType.SHUTTER_SPEED -> userShutterSpeedFlow
+        }
+
+    fun updateUserCameraValue(value: String) {
         cameraValueTextMutableFlow.update { value }
+    }
+
+    fun updateUserCameraValue(type: CameraValueType, value: Float) {
+        when (type) {
+            CameraValueType.APERTURE -> userApertureMutableFlow
+            CameraValueType.ISO -> userIsoMutableFlow
+            CameraValueType.SHUTTER_SPEED -> userShutterSpeedMutableFlow
+        }.update { value }
+    }
+
+    fun onClickCameraValueList(type: CameraValueType) {
+        unSelectableValueTypeMutableFlow.update { type }
     }
 
     class Factory(private val context: Context) : ViewModelProvider.NewInstanceFactory() {
