@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
 import kotlin.math.abs
 
+/**
+ * OnScrollListener to select item in the center.
+ */
 class CenterSelectScrollListener(
     private val recyclerView: RecyclerView,
     private val layoutManager: LinearLayoutManager,

@@ -221,7 +221,7 @@ class CameraImpl(context: Context) : Camera {
 
 
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = "CameraImpl"
 
     }
 

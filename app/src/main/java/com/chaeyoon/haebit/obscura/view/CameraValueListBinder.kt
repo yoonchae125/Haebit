@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.R
+import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
@@ -14,6 +15,9 @@ import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
+/**
+ * Binder to manage camera value list.
+ */
 @SuppressLint("ClickableViewAccessibility")
 class CameraValueListBinder(
     context: Context,
@@ -31,17 +35,18 @@ class CameraValueListBinder(
         )
     private val adapter = CameraValueListAdapter(type,
         { viewModel.onClickCameraValueList(type) },
-        { viewModel.updateUserCameraValue(it) })
+        { viewModel.updateUnSelectableCameraValue(it) })
+    private val centerScroller = CenterSmoothScroller(context)
     private val userCameraValueFlow = viewModel.getUserCameraValueFlow(type)
 
     init {
-        setDataList(type)
+        initRecyclerView()
         setRecyclerViewPadding(context)
-        setScrollListener(context)
+        setScrollListener()
         collectFlow()
     }
 
-    private fun setDataList(type: CameraValueType) {
+    private fun initRecyclerView() {
         cameraValueListView.adapter = adapter
         cameraValueListView.layoutManager = layoutManager
         adapter.submitList(getDataList())
@@ -66,14 +71,18 @@ class CameraValueListBinder(
         cameraValueListView.setPadding(padding, 0, padding, 0)
     }
 
-    private fun setScrollListener(context: Context) {
+    private fun setScrollListener() {
+        var selectedPosition = -1
         cameraValueListView.addOnScrollListener(
             CenterSelectScrollListener(
                 cameraValueListView,
                 layoutManager,
-                CenterSmoothScroller(context)
+                centerScroller
             ) { position ->
-                viewModel.updateUserCameraValue(type, valueList[position])
+                if (selectedPosition != position) {
+                    viewModel.updateUserCameraValue(type, valueList[position])
+                    selectedPosition = position
+                }
             }
         )
     }
@@ -82,11 +91,24 @@ class CameraValueListBinder(
         lifecycleOwner.launchAndRepeatOnLifecycle {
             viewModel.unSelectableValueTypeFlow.map { it == type }
                 .distinctUntilChanged()
-                .collect { unSelectable ->
+                .launchAndCollect(this) { unSelectable ->
                     disableTouchEvent(unSelectable)
                     adapter.submitList(getDataList())
                 }
+
+            userCameraValueFlow.launchAndCollect(this) {
+                adapter.submitList(getDataList())
+                scrollToCenter(it)
+            }
         }
+    }
+
+    private fun scrollToCenter(value: Float) {
+        val target = valueList.indexOf(value)
+        if (target < 0) return
+        if (centerScroller.targetPosition == target) return
+        centerScroller.targetPosition = target
+        layoutManager.startSmoothScroll(centerScroller)
     }
 
     private fun disableTouchEvent(disabled: Boolean) {

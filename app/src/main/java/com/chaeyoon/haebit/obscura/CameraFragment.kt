@@ -84,7 +84,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             viewModel.exposureValueFlow.launchAndCollect(this) {
                 binding.exposureValueText.text = it.toEVTextFormat()
             }
-            viewModel.cameraValueTextFlow.launchAndCollect(this) {
+            viewModel.unSelectableCameraValueTextFlow.launchAndCollect(this) {
                 binding.selectedCameraValueText.text = it
             }
         }
