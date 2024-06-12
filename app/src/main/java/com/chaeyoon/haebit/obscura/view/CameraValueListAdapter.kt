@@ -3,15 +3,14 @@ package com.chaeyoon.haebit.obscura.view
 import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
+import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.FontRes
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.ViewCameraValueItemBinding
-import com.chaeyoon.haebit.databinding.ViewShutterSpeedItemBinding
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedStringValues
 import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
@@ -31,32 +30,22 @@ class CameraValueListAdapter(
         parent: ViewGroup,
         viewType: Int
     ): CameraValueViewHolder {
+        val binding = ViewCameraValueItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
 
         return when (type) {
             CameraValueType.APERTURE -> {
-                val binding = ViewCameraValueItemBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
                 ApertureViewHolder(binding)
             }
 
             CameraValueType.SHUTTER_SPEED -> {
-                val binding = ViewShutterSpeedItemBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
                 ShutterSpeedViewHolder(binding)
             }
 
             CameraValueType.ISO -> {
-                val binding = ViewCameraValueItemBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
                 IsoViewHolder(binding)
             }
         }
@@ -66,84 +55,86 @@ class CameraValueListAdapter(
         holder.bind(currentList[position])
     }
 
-    abstract inner class CameraValueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    abstract inner class CameraValueViewHolder(val binding: ViewCameraValueItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        val context: Context = binding.root.context
+
         abstract fun bind(uiState: CameraValueUIState)
+
+        abstract fun getText(value: Float): String
+
+        fun Context.getTypeface(@FontRes resId: Int, path: String): Typeface =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                resources.getFont(resId)
+            } else {
+                Typeface.createFromAsset(resources.assets, path)
+            }
+
+        fun bindTextView(uiState: CameraValueUIState, typeface: Typeface) {
+            binding.valueText.setTextColor(getTextColor(uiState))
+            binding.valueText.typeface = typeface
+            binding.valueText.text = getText(uiState.value)
+            binding.root.setOnClickListener { onClick() }
+            if (uiState.isSelected && uiState.disabled) {
+                updateCenterValue(getText(uiState.value))
+            }
+        }
+
+        private fun getTextColor(uiState: CameraValueUIState) =
+            if (uiState.disabled && uiState.isSelected) {
+                context.resources.getColor(R.color.selected_value, null)
+            } else if (uiState.disabled) {
+                context.resources.getColor(R.color.disabled_value, null)
+            } else {
+                context.resources.getColor(R.color.white, null)
+            }
     }
 
-    private fun getTextColor(context: Context, uiState: CameraValueUIState) =
-        if (uiState.disabled && uiState.isSelected) {
-            context.resources.getColor(R.color.selected_value, null)
-        } else if (uiState.disabled) {
-            context.resources.getColor(R.color.disabled_value, null)
-        } else {
-            context.resources.getColor(R.color.white, null)
-        }
-
-    private fun Context.getTypeface(@FontRes resId: Int, path: String) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            resources.getFont(resId)
-        } else {
-            Typeface.createFromAsset(resources.assets, path)
-        }
-
-    inner class ApertureViewHolder(
-        private val binding: ViewCameraValueItemBinding
-    ) : CameraValueViewHolder(binding.root) {
+    inner class ApertureViewHolder(binding: ViewCameraValueItemBinding) :
+        CameraValueViewHolder(binding) {
         override fun bind(uiState: CameraValueUIState) {
-            val context = binding.root.context
             val typeface = context.getTypeface(
                 R.font.reddit_mono_semi_bold,
                 "reddit_mono_semi_bold.ttf"
             )
-            binding.valueText.typeface = typeface
-            binding.valueText.text = format(uiState.value)
-            binding.root.setOnClickListener { onClick() }
-            binding.valueText.setTextColor(getTextColor(context, uiState))
-            if (uiState.isSelected && uiState.disabled) {
-                updateCenterValue(format(uiState.value))
-            }
+            bindTextView(uiState, typeface)
         }
 
-        private fun format(value: Float) = "ƒ${value.toOneDecimalPlaces()}"
+        override fun getText(value: Float): String = "ƒ${value.toOneDecimalPlaces()}"
     }
 
-    inner class ShutterSpeedViewHolder(
-        private val binding: ViewShutterSpeedItemBinding
-    ) : CameraValueViewHolder(binding.root) {
+    inner class ShutterSpeedViewHolder(binding: ViewCameraValueItemBinding) :
+        CameraValueViewHolder(binding) {
         override fun bind(uiState: CameraValueUIState) {
-            val context = binding.root.context
             val typeface = context.getTypeface(
                 R.font.frank_ruhl_libre_extra_bold,
                 "frank_ruhl_libre_extra_bold.ttf"
             )
-            binding.valueText.typeface = typeface
-            binding.valueText.text = shutterSpeedStringValues[adapterPosition]
-            binding.root.setOnClickListener { onClick() }
-            binding.valueText.setTextColor(getTextColor(context, uiState))
-            if (uiState.isSelected && uiState.disabled) {
-                updateCenterValue(shutterSpeedStringValues[adapterPosition])
-            }
+            bindTextView(uiState, typeface)
+            binding.valueText.setTextSize(TypedValue.COMPLEX_UNIT_SP, SHUTTER_SPEED_TEXT_SIZE)
         }
+
+        override fun getText(value: Float): String = shutterSpeedStringValues[adapterPosition]
+
+
     }
 
-    inner class IsoViewHolder(
-        private val binding: ViewCameraValueItemBinding
-    ) : CameraValueViewHolder(binding.root) {
+
+    inner class IsoViewHolder(binding: ViewCameraValueItemBinding) :
+        CameraValueViewHolder(binding) {
         override fun bind(uiState: CameraValueUIState) {
-            val context = binding.root.context
             val typeface = context.getTypeface(
                 R.font.frank_ruhl_libre_extra_bold,
                 "frank_ruhl_libre_extra_bold.ttf"
             )
-            binding.valueText.typeface = typeface
-            binding.valueText.text = format(uiState.value)
-            binding.root.setOnClickListener { onClick() }
-            binding.valueText.setTextColor(getTextColor(context, uiState))
-            if (uiState.isSelected && uiState.disabled) {
-                updateCenterValue(format(uiState.value))
-            }
+            bindTextView(uiState, typeface)
         }
 
-        private fun format(value: Float) = value.toInt().toString()
+        override fun getText(value: Float): String = value.toInt().toString()
+    }
+
+    companion object {
+        private const val SHUTTER_SPEED_TEXT_SIZE = 16f
     }
 }
