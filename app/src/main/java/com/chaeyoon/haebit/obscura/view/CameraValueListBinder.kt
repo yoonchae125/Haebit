@@ -49,6 +49,7 @@ class CameraValueListBinder(
     private fun initRecyclerView() {
         cameraValueListView.adapter = adapter
         cameraValueListView.layoutManager = layoutManager
+        cameraValueListView.itemAnimator = null
         adapter.submitList(getDataList())
     }
 
