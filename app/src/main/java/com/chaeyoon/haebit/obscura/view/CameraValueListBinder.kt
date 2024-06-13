@@ -11,6 +11,7 @@ import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
+import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -25,7 +26,8 @@ class CameraValueListBinder(
     private val cameraValueListView: RecyclerView,
     private val valueList: List<Float>,
     private val type: CameraValueType,
-    private val viewModel: CameraFragmentViewModel
+    private val viewModel: CameraValueListViewModel,
+    private val updateCenterValue: (String) -> Unit
 ) {
     private val layoutManager =
         LinearLayoutManager(
@@ -33,9 +35,11 @@ class CameraValueListBinder(
             LinearLayoutManager.HORIZONTAL,
             false
         )
-    private val adapter = CameraValueListAdapter(type,
-        { viewModel.onClickCameraValueList(type) },
-        { viewModel.updateUnSelectableCameraValue(it) })
+    private val adapter = CameraValueListAdapter(
+        type,
+        onClick = { viewModel.onClickCameraValueList(type) },
+        updateCenterValue = { viewModel.updateUnSelectableCameraValue(it) }
+    )
     private val centerScroller = CenterSmoothScroller(context)
     private val userCameraValueFlow = viewModel.getUserCameraValueFlow(type)
 
@@ -100,6 +104,10 @@ class CameraValueListBinder(
             userCameraValueFlow.launchAndCollect(this) {
                 adapter.submitList(getDataList())
                 scrollToCenter(it)
+            }
+
+            viewModel.unSelectableCameraValueTextFlow.launchAndCollect(this) { centerText ->
+                updateCenterValue(centerText)
             }
         }
     }

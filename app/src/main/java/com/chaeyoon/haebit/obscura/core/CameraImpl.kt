@@ -37,7 +37,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class CameraImpl(context: Context) : Camera {
+class CameraImpl private constructor(context: Context) : Camera {
     // camera values
     private var mutableAperture = 0f
     private val isoMutableFlow = MutableStateFlow<Float>(0f)
@@ -221,8 +221,15 @@ class CameraImpl(context: Context) : Camera {
 
 
     companion object {
-        private val TAG = "CameraImpl"
-
+        private const val TAG = "CameraImpl"
+        private var instance: CameraImpl? = null
+        fun getInstance(context: Context): CameraImpl {
+            return instance ?: synchronized(this) {
+                CameraImpl(context).also {
+                    instance = it
+                }
+            }
+        }
     }
 
     inner class CameraStateCallbackImpl(
