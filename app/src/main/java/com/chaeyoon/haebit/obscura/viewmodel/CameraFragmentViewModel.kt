@@ -25,20 +25,20 @@ class CameraFragmentViewModel(
     private val camera: Camera,
     private val lightMeterCalculator: LightMeterCalculator = LightMeterCalculator()
 ) : ViewModel() {
-    val aperture: Float
+    private val aperture: Float
         get() = camera.aperture
-    val isoFlow: StateFlow<Float> = camera.isoFlow
-    val shutterSpeedFlow: StateFlow<Float> = camera.shutterSpeedFlow
-    val exposureValueFlow: StateFlow<Float> = camera.exposureValueFlow
+    private val isoFlow: StateFlow<Float> = camera.isoFlow
+    private val shutterSpeedFlow: StateFlow<Float> = camera.shutterSpeedFlow
+    private val exposureValueFlow: StateFlow<Float> = camera.exposureValueFlow
 
     private val userIsoMutableFlow = MutableStateFlow(
-        camera.isoFlow.value.nearest(isoValues)
+        isoFlow.value.nearest(isoValues)
     )
     private val userShutterSpeedMutableFlow = MutableStateFlow(
-        camera.shutterSpeedFlow.value.nearest(shutterSpeedValues)
+        shutterSpeedFlow.value.nearest(shutterSpeedValues)
     )
     private val userApertureMutableFlow = MutableStateFlow(
-        camera.aperture.nearest(apertureValues)
+        aperture.nearest(apertureValues)
     )
 
     private val unSelectableCameraValueTextMutableFlow = MutableStateFlow(isoFlow.value.toString())
@@ -55,7 +55,6 @@ class CameraFragmentViewModel(
                 calculateUnSelectableValue()
             }
         }
-
     }
 
     fun setCameraOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit) {
