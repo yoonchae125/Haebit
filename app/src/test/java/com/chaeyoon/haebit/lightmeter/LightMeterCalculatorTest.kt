@@ -109,4 +109,8 @@ class LightMeterCalculatorTest {
         }
         assertEquals(expectedApertureValues, resultApertureValues)
     }
+
+    private fun Float.nearest(among: List<Float>): Float {
+        return among.minByOrNull { kotlin.math.abs(it - this) } ?: this
+    }
 }

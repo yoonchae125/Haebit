@@ -1,7 +1,10 @@
 package com.chaeyoon.haebit.obscura.utils.extensions
 
-internal fun Float.nearest(among: List<Float>): Float {
-    return among.minByOrNull { kotlin.math.abs(it - this) } ?: this
+import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
+
+internal fun Float.nearest(among: List<CameraValue>): CameraValue {
+    val closestCameraValue = among.minByOrNull { kotlin.math.abs(it.value - this) }
+    return closestCameraValue ?: among.firstOrNull()?: error("cannot be null")
 }
 
 internal fun Float.toTwoDecimalPlaces(): Float {

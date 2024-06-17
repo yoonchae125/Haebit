@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.ViewCameraValueItemBinding
-import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedStringValues
-import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
 import com.chaeyoon.haebit.obscura.view.model.DIFF_CALLBACK
@@ -23,8 +21,7 @@ import com.chaeyoon.haebit.obscura.view.model.DIFF_CALLBACK
  */
 class CameraValueListAdapter(
     private val type: CameraValueType,
-    private val onClick: () -> Unit,
-    private val updateCenterValue: (String) -> Unit
+    private val onClick: () -> Unit
 ) : ListAdapter<CameraValueUIState, CameraValueListAdapter.CameraValueViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -62,8 +59,6 @@ class CameraValueListAdapter(
 
         abstract fun bind(uiState: CameraValueUIState)
 
-        abstract fun getText(value: Float): String
-
         fun Context.getTypeface(@FontRes resId: Int, path: String): Typeface =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 resources.getFont(resId)
@@ -74,11 +69,8 @@ class CameraValueListAdapter(
         fun bindTextView(uiState: CameraValueUIState, typeface: Typeface) {
             binding.valueText.setTextColor(getTextColor(uiState))
             binding.valueText.typeface = typeface
-            binding.valueText.text = getText(uiState.value)
+            binding.valueText.text = uiState.value.text
             binding.root.setOnClickListener { onClick() }
-            if (uiState.isSelected && uiState.disabled) {
-                updateCenterValue(getText(uiState.value))
-            }
         }
 
         private fun getTextColor(uiState: CameraValueUIState) =
@@ -100,8 +92,6 @@ class CameraValueListAdapter(
             )
             bindTextView(uiState, typeface)
         }
-
-        override fun getText(value: Float): String = "ƒ${value.toOneDecimalPlaces()}"
     }
 
     inner class ShutterSpeedViewHolder(binding: ViewCameraValueItemBinding) :
@@ -114,12 +104,7 @@ class CameraValueListAdapter(
             bindTextView(uiState, typeface)
             binding.valueText.setTextSize(TypedValue.COMPLEX_UNIT_SP, SHUTTER_SPEED_TEXT_SIZE)
         }
-
-        override fun getText(value: Float): String = shutterSpeedStringValues[adapterPosition]
-
-
     }
-
 
     inner class IsoViewHolder(binding: ViewCameraValueItemBinding) :
         CameraValueViewHolder(binding) {
@@ -130,8 +115,6 @@ class CameraValueListAdapter(
             )
             bindTextView(uiState, typeface)
         }
-
-        override fun getText(value: Float): String = value.toInt().toString()
     }
 
     companion object {
