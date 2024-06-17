@@ -42,6 +42,15 @@
             app:layout_constraintTop_toBottomOf="@id/selected_camera_value_text"
             tools:text="EV 4.52" />
 
+        <FrameLayout
+            android:id="@+id/marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/center_red_dot"
+            app:layout_constraintBottom_toTopOf="@id/aperture_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/aperture_list"
             android:layout_width="match_parent"
@@ -70,15 +79,6 @@
             android:orientation="horizontal"
             android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/marker" />
-
-        <FrameLayout
-            android:id="@+id/marker"
-            android:layout_width="2dp"
-            android:layout_height="5dp"
-            android:background="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
