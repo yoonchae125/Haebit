@@ -5,4 +5,5 @@
     <color name="disabled_value">#FF87878E</color>
     <color name="selected_value">#FFF7CE46</color>
     <color name="center_value">#FFFFFFFF</color>
+    <color name="center_red_dot">#FF0000</color>
 </resources>

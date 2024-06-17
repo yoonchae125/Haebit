@@ -15,10 +15,10 @@ import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
-import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
+import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
 
 /**
@@ -53,12 +53,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
-        viewModel.startCamera(lifecycleScope)
-
-        collectViewModel()
-
+        initCamera()
         initCameraValueListBinder()
+        collectViewModel()
     }
 
     override fun onStart() {
@@ -75,29 +72,30 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         permissionChecker = PermissionChecker(this)
     }
 
+    private fun initCamera() {
+        viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
+        viewModel.startCamera(lifecycleScope)
+    }
+
     private fun onCameraOpenFailed() {
         requireActivity().finish()
     }
 
-    private fun collectViewModel() {
-        viewLifecycleOwner.launchAndRepeatOnLifecycle {
-            viewModel.exposureValueFlow.launchAndCollect(this) {
-                binding.exposureValueText.text = it.toEVTextFormat()
-            }
-            viewModel.unSelectableCameraValueTextFlow.launchAndCollect(this) {
-                binding.selectedCameraValueText.text = it
-            }
-        }
-    }
-
     private fun initCameraValueListBinder() {
+        val binderViewModel: CameraValueListViewModel =
+            ViewModelProvider(
+                this,
+                CameraValueListViewModel.Factory(requireContext())
+            ).get()
+
         CameraValueListBinder(
             requireContext(),
             viewLifecycleOwner,
             binding.apertureList,
             apertureValues,
             CameraValueType.APERTURE,
-            viewModel
+            binderViewModel,
+            ::updateCenterValueText
         )
         CameraValueListBinder(
             requireContext(),
@@ -105,7 +103,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             binding.shutterSpeedList,
             shutterSpeedValues,
             CameraValueType.SHUTTER_SPEED,
-            viewModel
+            binderViewModel,
+            ::updateCenterValueText
         )
         CameraValueListBinder(
             requireContext(),
@@ -113,14 +112,20 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             binding.isoList,
             isoValues,
             CameraValueType.ISO,
-            viewModel
+            binderViewModel,
+            ::updateCenterValueText
         )
     }
 
-    private fun Float.toEVTextFormat(): String = "EV ${toTwoDecimalPlaces()}"
+    private fun updateCenterValueText(text: String) {
+        binding.selectedCameraValueText.text = text
+    }
 
-    companion object {
-        private val TAG = CameraFragment::class.java.simpleName
+    private fun collectViewModel() {
+        viewLifecycleOwner.launchAndRepeatOnLifecycle {
+            viewModel.exposureValueTextFlow.launchAndCollect(this) { text ->
+                binding.exposureValueText.text = text
+            }
+        }
     }
 }
-
