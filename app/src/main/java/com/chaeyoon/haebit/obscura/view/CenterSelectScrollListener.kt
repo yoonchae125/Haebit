@@ -15,6 +15,7 @@ class CenterSelectScrollListener(
     private val centerScroller: CenterSmoothScroller,
     private val onItemSelected: (Int) -> Unit,
 ) : RecyclerView.OnScrollListener() {
+    private var selectedPosition = -1
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         super.onScrollStateChanged(recyclerView, newState)
 
@@ -33,14 +34,15 @@ class CenterSelectScrollListener(
         val centerView = findCenterView(layoutManager)
         centerView?.let {
             val position = layoutManager.getPosition(it)
-            onItemSelected(position)
-            if (scrollToCenter) {
-                scrollToCenter(position)
+            if (selectedPosition != position) {
+                onItemSelected(position)
+                if (scrollToCenter) {
+                    scrollToCenter(position)
+                }
+                selectedPosition = position
             }
         }
-
     }
-
 
     private fun findCenterView(layoutManager: LinearLayoutManager): View? {
         var minDistance = Int.MAX_VALUE

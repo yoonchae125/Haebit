@@ -76,17 +76,13 @@ class CameraValueListBinder(
     }
 
     private fun setScrollListener() {
-        var selectedPosition = -1
         cameraValueListView.addOnScrollListener(
             CenterSelectScrollListener(
                 cameraValueListView,
                 layoutManager,
                 centerScroller
             ) { position ->
-                if (selectedPosition != position) {
-                    viewModel.updateUserCameraValue(type, valueList[position])
-                    selectedPosition = position
-                }
+                viewModel.updateUserCameraValue(type, valueList[position])
             }
         )
     }
@@ -107,6 +103,10 @@ class CameraValueListBinder(
 
             viewModel.unSelectableCameraValueTextFlow.launchAndCollect(this) { centerText ->
                 updateCenterValue(centerText)
+            }
+
+            viewModel.setListenerFlow.launchAndCollect(this) {
+                if (it) setScrollListener()
             }
         }
     }
