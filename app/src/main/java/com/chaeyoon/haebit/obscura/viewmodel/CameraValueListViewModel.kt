@@ -63,8 +63,10 @@ class CameraValueListViewModel(
     fun getUserCameraValueFlow(type: CameraValueType): StateFlow<CameraValue> =
         getUserCameraValueMutableFlow(type).asStateFlow()
 
-    private fun updateUnSelectableCameraValue(value: String) {
-        mutableUnSelectableCameraValueTextFlow.update { value }
+    private fun updateUnSelectableCameraValue(value: CameraValue) {
+        val unSelectableType = unSelectableValueTypeFlow.value
+        getUserCameraValueMutableFlow(unSelectableType).update { value }
+        mutableUnSelectableCameraValueTextFlow.update { value.text }
     }
 
     fun updateUserCameraValue(type: CameraValueType, value: CameraValue) {
@@ -96,8 +98,7 @@ class CameraValueListViewModel(
                 mutableUserApertureFlow.value.value
             ).nearest(shutterSpeedValues)
         }
-        getUserCameraValueMutableFlow(unSelectableType).update { value }
-        updateUnSelectableCameraValue(value.text)
+        updateUnSelectableCameraValue(value)
     }
 
 

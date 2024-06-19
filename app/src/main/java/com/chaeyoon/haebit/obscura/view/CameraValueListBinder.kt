@@ -104,10 +104,6 @@ class CameraValueListBinder(
             viewModel.unSelectableCameraValueTextFlow.launchAndCollect(this) { centerText ->
                 updateCenterValue(centerText)
             }
-
-            viewModel.setListenerFlow.launchAndCollect(this) {
-                if (it) setScrollListener()
-            }
         }
     }
 

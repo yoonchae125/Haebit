@@ -16,18 +16,23 @@ class CenterSelectScrollListener(
     private val onItemSelected: (Int) -> Unit,
 ) : RecyclerView.OnScrollListener() {
     private var selectedPosition = -1
+    private var initialScroll = true
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         super.onScrollStateChanged(recyclerView, newState)
 
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-            selectCenterItem(true)
+            if(!initialScroll) {
+                selectCenterItem(true)
+            }
+            initialScroll = false
         }
     }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
-
-        selectCenterItem()
+        if(initialScroll){
+            selectCenterItem()
+        }
     }
 
     private fun selectCenterItem(scrollToCenter: Boolean = false) {
