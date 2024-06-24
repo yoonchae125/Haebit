@@ -66,7 +66,7 @@ class CameraValueListViewModel(
     private fun updateUnSelectableCameraValue(value: CameraValue) {
         val unSelectableType = unSelectableValueTypeFlow.value
         getUserCameraValueMutableFlow(unSelectableType).update { value }
-        mutableUnSelectableCameraValueTextFlow.update { value.text }
+        mutableUnSelectableCameraValueTextFlow.update { value.getText() }
     }
 
     fun updateUserCameraValue(type: CameraValueType, value: CameraValue) {
