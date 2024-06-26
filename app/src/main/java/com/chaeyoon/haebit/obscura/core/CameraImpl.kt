@@ -59,6 +59,9 @@ class CameraImpl private constructor(context: Context) : Camera {
     private var outView: AutoFitSurfaceView? = null
     private lateinit var onCameraOpenFailed: () -> Unit
 
+    private val mutableIsLocked = MutableStateFlow(false)
+    override val isLockedFlow = mutableIsLocked.asStateFlow()
+
     override fun setOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit) {
         this.outView = outView
         this.onCameraOpenFailed = onCameraOpenFailed
@@ -92,11 +95,18 @@ class CameraImpl private constructor(context: Context) : Camera {
         })
     }
 
-
     override fun startCamera(coroutineScope: CoroutineScope) {
         outView?.rootView?.post {
             internalStartCamera(coroutineScope)
         }
+    }
+
+    override fun lock(x: Float, y: Float, coroutineScope: CoroutineScope) {
+        mutableIsLocked.update { true }
+    }
+
+    override fun unLock() {
+        mutableIsLocked.update { false }
     }
 
     private fun internalStartCamera(coroutineScope: CoroutineScope) =

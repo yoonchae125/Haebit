@@ -1,13 +1,15 @@
 package com.chaeyoon.haebit.obscura
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
-import androidx.lifecycle.lifecycleScope
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
@@ -74,7 +76,24 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun initCamera() {
         viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
-        viewModel.startCamera(lifecycleScope)
+        viewModel.startCamera()
+        setCameraLockButtonListeners()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setCameraLockButtonListeners(){
+        binding.cameraPreview.setOnTouchListener { _, event ->
+            val actionMasked = event.actionMasked
+            if (actionMasked != MotionEvent.ACTION_DOWN) {
+                return@setOnTouchListener false
+            }
+            viewModel.lockCamera(event.x, event.y)
+            false
+        }
+
+        binding.unlockButton.setOnClickListener {
+            viewModel.unlockCamera()
+        }
     }
 
     private fun onCameraOpenFailed() {
@@ -125,6 +144,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         viewLifecycleOwner.launchAndRepeatOnLifecycle {
             viewModel.exposureValueTextFlow.launchAndCollect(this) { text ->
                 binding.exposureValueText.text = text
+            }
+
+            viewModel.lockIconVisibility.launchAndCollect(this) { isVisible ->
+                binding.unlockButton.isVisible = isVisible
             }
         }
     }
