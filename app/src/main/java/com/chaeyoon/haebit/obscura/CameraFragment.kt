@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import com.chaeyoon.haebit.BuildConfig
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
@@ -41,8 +42,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private lateinit var permissionChecker: PermissionChecker
 
-    private val debug = true
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,7 +60,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         initCamera()
         initCameraValueListBinder()
         collectViewModel()
-        if (debug) {
+
+        if (BuildConfig.DEBUG) {
             displayDebugView()
         }
     }
