@@ -26,6 +26,7 @@ class CameraFragmentViewModel(
     val shutterSpeedFlow = camera.shutterSpeedFlow
     val aperture = camera.aperture
     val lensFocusDistanceFlow = camera.lensFocusDistanceFlow
+    val lockStateFlow = camera.lockStateFlow
 
     val exposureValueTextFlow: Flow<String> = camera.exposureValueFlow.map { it.toEVTextFormat() }
     val lockIconVisibility: StateFlow<Boolean> = camera.isLockedFlow
