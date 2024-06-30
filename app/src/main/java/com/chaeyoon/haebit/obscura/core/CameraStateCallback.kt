@@ -14,7 +14,6 @@ class CameraStateCallback(
 
     override fun onDisconnected(device: CameraDevice) {
         Log.w(TAG, "Camera has been disconnected")
-        onCameraOpenFailed()
         device.close()
     }
 
@@ -27,9 +26,11 @@ class CameraStateCallback(
             ERROR_MAX_CAMERAS_IN_USE -> "Maximum cameras in use"
             else -> "Unknown"
         }
-        val exc = RuntimeException("Camera error: ($error) $msg")
-        Log.e(TAG, exc.message, exc)
-        if (cont.isActive) cont.resumeWithException(exc)
+        val ex = RuntimeException("Camera error: ($error) $msg")
+        Log.e(TAG, ex.message, ex)
+        if (cont.isActive) cont.resumeWithException(ex)
+        device.close()
+        onCameraOpenFailed()
     }
 
     companion object{

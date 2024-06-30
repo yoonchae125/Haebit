@@ -65,6 +65,11 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.startCamera()
+    }
     override fun onStart() {
         super.onStart()
         permissionChecker.checkCameraPermissions()
@@ -81,7 +86,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun initCamera() {
         viewModel.setCameraOutView(binding.cameraPreview, ::onCameraOpenFailed)
-        viewModel.startCamera()
         setCameraLockButtonListeners()
     }
 
