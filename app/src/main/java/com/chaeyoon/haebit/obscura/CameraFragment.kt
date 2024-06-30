@@ -22,6 +22,7 @@ import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
+import kotlinx.coroutines.flow.combine
 
 /**
  * CameraFragment
@@ -60,7 +61,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         initCamera()
         initCameraValueListBinder()
         collectViewModel()
-        if(debug){
+        if (debug) {
             displayDebugView()
         }
     }
@@ -70,6 +71,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         viewModel.startCamera()
     }
+
     override fun onStart() {
         super.onStart()
         permissionChecker.checkCameraPermissions()
@@ -90,7 +92,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setCameraLockButtonListeners(){
+    private fun setCameraLockButtonListeners() {
         binding.cameraPreview.setOnTouchListener { _, event ->
             val actionMasked = event.actionMasked
             if (actionMasked != MotionEvent.ACTION_DOWN) {
@@ -161,28 +163,27 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
     }
 
-    private fun displayDebugView(){
+    private fun displayDebugView() {
         viewLifecycleOwner.launchAndRepeatOnLifecycle {
-            viewModel.isoFlow.launchAndCollect(this){
-                updateText()
-            }
-            viewModel.shutterSpeedFlow.launchAndCollect(this){
-                updateText()
-            }
-            viewModel.exposureValueFlow.launchAndCollect(this){
-                updateText()
-            }
-            viewModel.lensFocusDistanceFlow.launchAndCollect(this){
+            combine(
+                viewModel.isoFlow,
+                viewModel.shutterSpeedFlow,
+                viewModel.exposureValueFlow,
+                viewModel.lensFocusDistanceFlow,
+                viewModel.lockStateFlow
+            ) { _, _, _, _, _ -> }.launchAndCollect(this) {
                 updateText()
             }
         }
     }
 
-    private fun updateText(){
-        binding.debugView.text = "aperture ${viewModel.aperture}\n" +
+    private fun updateText() {
+        val text = "aperture ${viewModel.aperture}\n" +
                 "iso ${viewModel.isoFlow.value}\n" +
                 "shutterspeed ${viewModel.shutterSpeedFlow.value}\n" +
                 "exposure ${viewModel.exposureValueFlow.value}\n" +
-                "lens focus distance ${viewModel.lensFocusDistanceFlow.value}\n"
+                "lens focus distance ${viewModel.lensFocusDistanceFlow.value}\n" +
+                "lock state ${viewModel.lockStateFlow.value}"
+        binding.debugView.text = text
     }
 }

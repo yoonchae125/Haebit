@@ -68,6 +68,9 @@ class CameraImpl private constructor(context: Context) : Camera {
     private val lensFocusDistanceMutableFlow = MutableStateFlow(0f)
     override val lensFocusDistanceFlow: StateFlow<Float> =
         lensFocusDistanceMutableFlow.asStateFlow()
+    private val lockStateMutableFlow = MutableStateFlow(LockState.UNLOCKED)
+    override val lockStateFlow: StateFlow<LockState> =
+        lockStateMutableFlow.asStateFlow()
 
     private val mutableIsLocked = MutableStateFlow(false)
     override val isLockedFlow = mutableIsLocked.asStateFlow()
@@ -147,6 +150,8 @@ class CameraImpl private constructor(context: Context) : Camera {
     override fun lock(x: Float, y: Float, coroutineScope: CoroutineScope) {
         unLock()
 
+        lockStateMutableFlow.update { LockState.LOCK_PROCESSING }
+
         captureSession?.stopRepeating()
 
         setLockRegion(characteristics, x, y)
@@ -211,6 +216,7 @@ class CameraImpl private constructor(context: Context) : Camera {
         )
 
         mutableIsLocked.update { true }
+        lockStateMutableFlow.update { LockState.LOCKED }
     }
 
     private fun offAutoControlMode() {
@@ -250,6 +256,7 @@ class CameraImpl private constructor(context: Context) : Camera {
             cameraHandler
         )
         mutableIsLocked.update { false }
+        lockStateMutableFlow.update { LockState.UNLOCKED }
     }
 
     private fun cancelTriggerLock() {
