@@ -4,7 +4,6 @@ import android.hardware.camera2.CameraDevice
 import android.util.Log
 import kotlinx.coroutines.CancellableContinuation
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class CameraStateCallback(
     private val onCameraOpenFailed: () -> Unit,
@@ -14,7 +13,6 @@ class CameraStateCallback(
 
     override fun onDisconnected(device: CameraDevice) {
         Log.w(TAG, "Camera has been disconnected")
-        onCameraOpenFailed()
         device.close()
     }
 
@@ -27,9 +25,9 @@ class CameraStateCallback(
             ERROR_MAX_CAMERAS_IN_USE -> "Maximum cameras in use"
             else -> "Unknown"
         }
-        val exc = RuntimeException("Camera error: ($error) $msg")
-        Log.e(TAG, exc.message, exc)
-        if (cont.isActive) cont.resumeWithException(exc)
+        Log.e(TAG, msg)
+        device.close()
+        onCameraOpenFailed()
     }
 
     companion object{
