@@ -19,6 +19,14 @@ import kotlinx.coroutines.flow.map
 class CameraFragmentViewModel(
     private val camera: Camera
 ) : ViewModel() {
+
+    // for debug
+    val isoFlow = camera.isoFlow
+    val exposureValueFlow = camera.exposureValueFlow
+    val shutterSpeedFlow = camera.shutterSpeedFlow
+    val aperture = camera.aperture
+    val lensFocusDistanceFlow = camera.lensFocusDistanceFlow
+
     val exposureValueTextFlow: Flow<String> = camera.exposureValueFlow.map { it.toEVTextFormat() }
     val lockIconVisibility: StateFlow<Boolean> = camera.isLockedFlow
 

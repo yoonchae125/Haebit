@@ -40,6 +40,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private lateinit var permissionChecker: PermissionChecker
 
+    private val debug = true
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,6 +60,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         initCamera()
         initCameraValueListBinder()
         collectViewModel()
+        if(debug){
+            displayDebugView()
+        }
     }
 
     override fun onStart() {
@@ -150,5 +155,30 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 binding.unlockButton.isVisible = isVisible
             }
         }
+    }
+
+    private fun displayDebugView(){
+        viewLifecycleOwner.launchAndRepeatOnLifecycle {
+            viewModel.isoFlow.launchAndCollect(this){
+                updateText()
+            }
+            viewModel.shutterSpeedFlow.launchAndCollect(this){
+                updateText()
+            }
+            viewModel.exposureValueFlow.launchAndCollect(this){
+                updateText()
+            }
+            viewModel.lensFocusDistanceFlow.launchAndCollect(this){
+                updateText()
+            }
+        }
+    }
+
+    private fun updateText(){
+        binding.debugView.text = "aperture ${viewModel.aperture}\n" +
+                "iso ${viewModel.isoFlow.value}\n" +
+                "shutterspeed ${viewModel.shutterSpeedFlow.value}\n" +
+                "exposure ${viewModel.exposureValueFlow.value}\n" +
+                "lens focus distance ${viewModel.lensFocusDistanceFlow.value}\n"
     }
 }

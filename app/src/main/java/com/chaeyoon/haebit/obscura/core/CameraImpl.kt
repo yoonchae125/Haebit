@@ -50,6 +50,11 @@ class CameraImpl private constructor(context: Context) : Camera {
     override val exposureValueFlow: StateFlow<Float> = exposureValueMutableFlow.asStateFlow()
     private val lightMeterCalculator = LightMeterCalculator()
 
+    // debug
+    private val lensFocusDistanceMutableFlow = MutableStateFlow<Float>(0f)
+    override val lensFocusDistanceFlow: StateFlow<Float> =
+        lensFocusDistanceMutableFlow.asStateFlow()
+
     // camera
     private val cameraManager: CameraManager =
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -156,6 +161,10 @@ class CameraImpl private constructor(context: Context) : Camera {
         Log.d(TAG, "iso: $iso")
         Log.d(TAG, "shutter speed: $shutterSpeed")
         Log.d(TAG, "exposure value: $exposureValue")
+
+        // debug
+        val lensFocusDistance = result.get(CaptureResult.LENS_FOCUS_DISTANCE)!!
+        lensFocusDistanceMutableFlow.update { lensFocusDistance }
     }
 
     private fun getCameraId(): String? {
