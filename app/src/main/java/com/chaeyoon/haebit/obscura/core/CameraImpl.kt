@@ -3,14 +3,19 @@ package com.chaeyoon.haebit.obscura.core
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.ImageFormat
+import android.graphics.RectF
+import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
+import android.hardware.camera2.CaptureFailure
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
+import android.hardware.camera2.params.MeteringRectangle
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
 import android.os.Build
@@ -21,10 +26,18 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import com.chaeyoon.haebit.lightmeter.LightMeterCalculator
 import com.chaeyoon.haebit.lightmeter.functions.nanoSecondsToSeconds
-import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
+import com.chaeyoon.haebit.obscura.utils.CameraCoordinateTransformer
+import com.chaeyoon.haebit.obscura.utils.TimeoutManger
+import com.chaeyoon.haebit.obscura.utils.extensions.getTouchLockRegion
+import com.chaeyoon.haebit.obscura.utils.extensions.isExposureConverged
+import com.chaeyoon.haebit.obscura.utils.extensions.isFocused
+import com.chaeyoon.haebit.obscura.utils.extensions.isMeteringAreaAESupported
+import com.chaeyoon.haebit.obscura.utils.extensions.isMeteringAreaAFSupported
 import com.chaeyoon.haebit.obscura.utils.functions.getPreviewOutputSize
+import com.chaeyoon.haebit.obscura.utils.functions.logAEState
+import com.chaeyoon.haebit.obscura.utils.functions.logAFState
+import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
 import com.google.android.gms.common.util.concurrent.HandlerExecutor
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,12 +50,13 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+
 class CameraImpl private constructor(context: Context) : Camera {
     // camera values
     private var mutableAperture = 0f
-    private val isoMutableFlow = MutableStateFlow<Float>(0f)
-    private val shutterSpeedMutableFlow = MutableStateFlow<Float>(0f)
-    private val exposureValueMutableFlow = MutableStateFlow<Float>(0f)
+    private val isoMutableFlow = MutableStateFlow(0f)
+    private val shutterSpeedMutableFlow = MutableStateFlow(0f)
+    private val exposureValueMutableFlow = MutableStateFlow(0f)
     override val aperture: Float
         get() = mutableAperture
     override val isoFlow: StateFlow<Float> = isoMutableFlow.asStateFlow()
@@ -50,23 +64,47 @@ class CameraImpl private constructor(context: Context) : Camera {
     override val exposureValueFlow: StateFlow<Float> = exposureValueMutableFlow.asStateFlow()
     private val lightMeterCalculator = LightMeterCalculator()
 
+    // debug
+    private val lensFocusDistanceMutableFlow = MutableStateFlow(0f)
+    override val lensFocusDistanceFlow: StateFlow<Float> =
+        lensFocusDistanceMutableFlow.asStateFlow()
+
+    private val mutableIsLocked = MutableStateFlow(false)
+    override val isLockedFlow = mutableIsLocked.asStateFlow()
+
     // camera
     private val cameraManager: CameraManager =
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     private lateinit var cameraId: String
+    private var captureSession: CameraCaptureSession? = null
+    private lateinit var characteristics: CameraCharacteristics
+
     private val cameraThread = HandlerThread("CameraThread").apply { start() }
     private val cameraHandler = Handler(cameraThread.looper)
-    private var outView: AutoFitSurfaceView? = null
+
+    private var surfaceView: AutoFitSurfaceView? = null
     private lateinit var onCameraOpenFailed: () -> Unit
+    private lateinit var previewRequestBuilder: CaptureRequest.Builder
+
+    private var touchLockRegion = MeteringRectangle(0, 0, 0, 0, 0)
+    private val timeoutManger = TimeoutManger(PRECAPTURE_TIMEOUT_MS)
+    private lateinit var cameraCoordinateTransformer: CameraCoordinateTransformer
 
     override fun setOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit) {
-        this.outView = outView
+        this.surfaceView = outView
         this.onCameraOpenFailed = onCameraOpenFailed
+
         getCameraId()?.let { cameraId = it } ?: run { onCameraOpenFailed() }
 
-        val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+        addSurfaceHolderCallback(outView)
 
-        outView.holder.addCallback(object : SurfaceHolder.Callback {
+        outView.post {
+            initCoordinateTransformer(outView)
+        }
+    }
+
+    private fun addSurfaceHolderCallback(surfaceView: AutoFitSurfaceView) {
+        surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceDestroyed(holder: SurfaceHolder) = Unit
 
             override fun surfaceChanged(
@@ -79,79 +117,209 @@ class CameraImpl private constructor(context: Context) : Camera {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 // Selects appropriate preview size and configures view finder
                 val previewSize = getPreviewOutputSize(
-                    outView.display,
+                    surfaceView.display,
                     characteristics,
                     ImageFormat.YUV_420_888
                 )
 
-                outView.setAspectRatio(
+                surfaceView.setAspectRatio(
                     previewSize.width,
                     previewSize.height
                 )
             }
         })
+
     }
 
+    private fun initCoordinateTransformer(surfaceView: AutoFitSurfaceView) {
+        val surfaceRect =
+            RectF(0f, 0f, surfaceView.width.toFloat(), surfaceView.height.toFloat())
+        cameraCoordinateTransformer =
+            CameraCoordinateTransformer(characteristics, surfaceRect)
+    }
 
     override fun startCamera(coroutineScope: CoroutineScope) {
-        outView?.rootView?.post {
+        surfaceView?.rootView?.post {
             internalStartCamera(coroutineScope)
         }
     }
 
+    override fun lock(x: Float, y: Float, coroutineScope: CoroutineScope) {
+        unLock()
+
+        captureSession?.stopRepeating()
+
+        setLockRegion(characteristics, x, y)
+
+        setTriggerLock()
+
+        timeoutManger.startTimerLocked()
+
+        captureSession?.capture(
+            previewRequestBuilder.build(),
+            createLockCaptureCallback(),
+            cameraHandler
+        )
+    }
+
+    private fun setTriggerLock() {
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AF_MODE,
+            CaptureRequest.CONTROL_AF_MODE_AUTO
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AE_MODE,
+            CaptureRequest.CONTROL_AE_MODE_ON
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+            CameraMetadata.CONTROL_AE_PRECAPTURE_TRIGGER_START
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AF_TRIGGER,
+            CameraMetadata.CONTROL_AF_TRIGGER_START
+        )
+    }
+
+    private fun internalLock(result: CaptureResult) {
+        val currentAeSensitivity = result.get(CaptureResult.SENSOR_SENSITIVITY)
+        val currentAeExposureTime = result.get(CaptureResult.SENSOR_EXPOSURE_TIME)
+        val lensFocusDistance = result.get(CaptureResult.LENS_FOCUS_DISTANCE)
+
+        offAutoControlMode()
+
+        if (currentAeSensitivity != null) {
+            previewRequestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, currentAeSensitivity)
+        }
+        if (currentAeExposureTime != null) {
+            previewRequestBuilder.set(
+                CaptureRequest.SENSOR_EXPOSURE_TIME,
+                currentAeExposureTime
+            )
+        }
+        if (lensFocusDistance != null) {
+            previewRequestBuilder.set(
+                CaptureRequest.LENS_FOCUS_DISTANCE,
+                lensFocusDistance
+            )
+        }
+
+        captureSession?.setRepeatingRequest(
+            previewRequestBuilder.build(),
+            createCameraCaptureCallback(),
+            null
+        )
+
+        mutableIsLocked.update { true }
+    }
+
+    private fun offAutoControlMode() {
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AE_MODE,
+            CaptureRequest.CONTROL_AE_MODE_OFF
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AF_MODE,
+            CaptureRequest.CONTROL_AF_MODE_OFF
+        )
+//        previewRequestBuilder.set(
+//            CaptureRequest.CONTROL_AE_LOCK,
+//            true
+//        )
+    }
+
+    override fun unLock() {
+        captureSession?.stopRepeating()
+
+        cancelTriggerLock()
+
+        onAutoControlMode()
+
+        captureSession?.capture(
+            previewRequestBuilder.build(),
+            object : CaptureCallback() {
+                override fun onCaptureCompleted(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    result: TotalCaptureResult
+                ) {
+                    startCameraPreview()
+                    updateCameraValues(result)
+                }
+            },
+            cameraHandler
+        )
+        mutableIsLocked.update { false }
+    }
+
+    private fun cancelTriggerLock() {
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AF_TRIGGER,
+            CaptureRequest.CONTROL_AF_TRIGGER_CANCEL
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+            CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL
+        )
+    }
+
+    private fun onAutoControlMode() {
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AF_MODE,
+            CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AE_MODE,
+            CaptureRequest.CONTROL_AE_MODE_ON
+        )
+        previewRequestBuilder.set(
+            CaptureRequest.CONTROL_AE_LOCK,
+            false
+        )
+    }
+
+    private fun startCameraPreview() {
+        captureSession?.setRepeatingRequest(
+            previewRequestBuilder.build(),
+            createCameraCaptureCallback(),
+            cameraHandler
+        )
+    }
+
     private fun internalStartCamera(coroutineScope: CoroutineScope) =
         coroutineScope.launch(Dispatchers.Main) {
-            val nonNullView = requireNotNull(outView)
+            val nonNullView = requireNotNull(surfaceView)
             val camera = openCamera(cameraId, onCameraOpenFailed)
 
             // Creates list of Surfaces where the camera will output frames
             val targets = listOf(nonNullView.holder.surface)
 
             // Start a capture session using our open camera and list of Surfaces where frames will go
-            val session = createCaptureSession(camera, targets)
+            captureSession = createCaptureSession(camera, targets)
 
-            val captureRequestBuilder = camera.createCaptureRequest(
+            previewRequestBuilder = camera.createCaptureRequest(
                 CameraDevice.TEMPLATE_PREVIEW
-            ).apply { addTarget(nonNullView.holder.surface) }
+            ).apply {
+                addTarget(nonNullView.holder.surface)
+                set(
+                    CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON
+                )
+                set(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_AUTO
+                )
+            }
 
-            mutableAperture = captureRequestBuilder.get(CaptureRequest.LENS_APERTURE)!!
+            mutableAperture = previewRequestBuilder.get(CaptureRequest.LENS_APERTURE)!!
 
-            // This will keep sending the capture request as frequently as possible until the
-            // session is torn down or session.stopRepeating() is called
-            session.setRepeatingRequest(captureRequestBuilder.build(), object :
-                CameraCaptureSession.CaptureCallback() {
-                override fun onCaptureCompleted(
-                    session: CameraCaptureSession,
-                    request: CaptureRequest,
-                    result: TotalCaptureResult
-                ) {
-                    super.onCaptureCompleted(session, request, result)
-
-                    updateCameraValues(result)
-                }
-            }, cameraHandler)
+            startCameraPreview()
         }
-
-    private fun updateCameraValues(result: CaptureResult) {
-        val iso = result.get(CaptureResult.SENSOR_SENSITIVITY)!!
-        val shutterSpeed = nanoSecondsToSeconds(result.get(CaptureResult.SENSOR_EXPOSURE_TIME)!!)
-        val exposureValue =
-            lightMeterCalculator.calculateExposureValue(aperture, shutterSpeed, iso.toFloat())
-
-        isoMutableFlow.update { iso.toFloat() }
-        shutterSpeedMutableFlow.update { shutterSpeed }
-        exposureValueMutableFlow.update { exposureValue }
-
-        Log.d(TAG, "aperture: $aperture")
-        Log.d(TAG, "iso: $iso")
-        Log.d(TAG, "shutter speed: $shutterSpeed")
-        Log.d(TAG, "exposure value: $exposureValue")
-    }
 
     private fun getCameraId(): String? {
         return cameraManager.cameraIdList
             .find {
-                val characteristics = cameraManager.getCameraCharacteristics(it)
+                characteristics = cameraManager.getCameraCharacteristics(it)
                 val capabilities = characteristics.get(
                     CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES
                 )
@@ -176,7 +344,7 @@ class CameraImpl private constructor(context: Context) : Camera {
     ): CameraDevice = suspendCancellableCoroutine { cont ->
         cameraManager.openCamera(
             cameraId,
-            CameraStateCallbackImpl(onCameraOpenFailed, cont),
+            CameraStateCallback(onCameraOpenFailed, cont),
             cameraHandler
         )
     }
@@ -198,7 +366,6 @@ class CameraImpl private constructor(context: Context) : Camera {
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-
             val outputs = targets.map {
                 OutputConfiguration(it)
             }
@@ -219,9 +386,113 @@ class CameraImpl private constructor(context: Context) : Camera {
         }
     }
 
+    private fun createCameraCaptureCallback() = object : CaptureCallback() {
+        override fun onCaptureCompleted(
+            session: CameraCaptureSession,
+            request: CaptureRequest,
+            result: TotalCaptureResult
+        ) {
+            updateCameraValues(result)
+        }
+    }
+
+    private fun createLockCaptureCallback(): CaptureCallback =
+        object : CaptureCallback() {
+            override fun onCaptureCompleted(
+                session: CameraCaptureSession,
+                request: CaptureRequest,
+                result: TotalCaptureResult
+            ) {
+                logAEState(TAG, result)
+                logAFState(TAG, result)
+
+                val focused = result.isFocused()
+                val exposureConverged = result.isExposureConverged()
+
+                if (focused && (timeoutManger.hitTimeoutLocked() || exposureConverged)) {
+                    internalLock(result)
+                } else {
+                    retryLock()
+                }
+
+                updateCameraValues(result)
+            }
+
+            override fun onCaptureFailed(
+                session: CameraCaptureSession,
+                request: CaptureRequest,
+                failure: CaptureFailure
+            ) {
+                Log.e(TAG, "Manual AF failure: $failure")
+            }
+        }
+
+    private fun retryLock() {
+        try {
+            previewRequestBuilder.set(
+                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE
+            )
+            previewRequestBuilder.set(
+                CaptureRequest.CONTROL_AF_TRIGGER,
+                CaptureRequest.CONTROL_AF_TRIGGER_IDLE
+            )
+
+            captureSession?.capture(
+                previewRequestBuilder.build(),
+                createLockCaptureCallback(),
+                cameraHandler
+            )
+        } catch (e: CameraAccessException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setLockRegion(characteristics: CameraCharacteristics, x: Float, y: Float) {
+        touchLockRegion = cameraCoordinateTransformer.getTouchLockRegion(x, y, LOCK_REGION_SIZE)
+
+        if (characteristics.isMeteringAreaAFSupported()) {
+            previewRequestBuilder.set(
+                CaptureRequest.CONTROL_AF_REGIONS,
+                arrayOf(touchLockRegion)
+            )
+        }
+
+        if (characteristics.isMeteringAreaAESupported()) {
+            previewRequestBuilder.set(
+                CaptureRequest.CONTROL_AE_REGIONS,
+                arrayOf(touchLockRegion)
+            )
+        }
+    }
+
+    private fun updateCameraValues(result: CaptureResult) {
+        val iso = result.get(CaptureResult.SENSOR_SENSITIVITY)!!
+        val shutterSpeed =
+            nanoSecondsToSeconds(result.get(CaptureResult.SENSOR_EXPOSURE_TIME)!!)
+        val exposureValue =
+            lightMeterCalculator.calculateExposureValue(aperture, shutterSpeed, iso.toFloat())
+
+        isoMutableFlow.update { iso.toFloat() }
+        shutterSpeedMutableFlow.update { shutterSpeed }
+        exposureValueMutableFlow.update { exposureValue }
+
+        Log.d(TAG, "aperture: $aperture")
+        Log.d(TAG, "iso: $iso")
+        Log.d(TAG, "shutter speed: $shutterSpeed")
+        Log.d(TAG, "exposure value: $exposureValue")
+
+        // debug
+        val lensFocusDistance = result.get(CaptureResult.LENS_FOCUS_DISTANCE)!!
+        lensFocusDistanceMutableFlow.update { lensFocusDistance }
+        Log.d(TAG, "lens focus distance: $lensFocusDistance")
+    }
 
     companion object {
         private const val TAG = "CameraImpl"
+        private const val PRECAPTURE_TIMEOUT_MS = 2000L
+        private const val LOCK_REGION_SIZE = 150
+
         private var instance: CameraImpl? = null
         fun getInstance(context: Context): CameraImpl {
             return instance ?: synchronized(this) {
@@ -229,32 +500,6 @@ class CameraImpl private constructor(context: Context) : Camera {
                     instance = it
                 }
             }
-        }
-    }
-
-    inner class CameraStateCallbackImpl(
-        private val onCameraOpenFailed: () -> Unit,
-        private val cont: CancellableContinuation<CameraDevice>
-    ) : CameraDevice.StateCallback() {
-        override fun onOpened(device: CameraDevice) = cont.resume(device)
-
-        override fun onDisconnected(device: CameraDevice) {
-            Log.w(TAG, "Camera has been disconnected")
-            onCameraOpenFailed()
-        }
-
-        override fun onError(device: CameraDevice, error: Int) {
-            val msg = when (error) {
-                ERROR_CAMERA_DEVICE -> "Fatal (device)"
-                ERROR_CAMERA_DISABLED -> "Device policy"
-                ERROR_CAMERA_IN_USE -> "Camera in use"
-                ERROR_CAMERA_SERVICE -> "Fatal (service)"
-                ERROR_MAX_CAMERAS_IN_USE -> "Maximum cameras in use"
-                else -> "Unknown"
-            }
-            val exc = RuntimeException("Camera error: ($error) $msg")
-            Log.e(TAG, exc.message, exc)
-            if (cont.isActive) cont.resumeWithException(exc)
         }
     }
 }
