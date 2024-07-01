@@ -1,11 +1,15 @@
 package com.chaeyoon.haebit.obscura
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +21,7 @@ import com.chaeyoon.haebit.databinding.FragmentCameraBinding
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
+import com.chaeyoon.haebit.obscura.utils.extensions.getVibrator
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
@@ -49,6 +54,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private lateinit var permissionChecker: PermissionChecker
+    private val vibrator by lazy { requireContext().getVibrator() }
 
     private val mutex = Mutex()
     private var delayLockRectHideJob: Job? = null
@@ -111,13 +117,27 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             if (actionMasked != MotionEvent.ACTION_DOWN) {
                 return@setOnTouchListener false
             }
+            vibrate()
             viewModel.lockCamera(event.x, event.y)
             false
         }
 
         binding.unlockButton.setOnClickListener {
+            vibrate()
             viewModel.unlockCamera()
+            vibrate()
         }
+    }
+
+    private fun vibrate() {
+        val vibrator = vibrator?.takeIf(Vibrator::hasVibrator)
+            ?: return
+
+        val effect = VibrationEffect.createOneShot(
+            VIBRATE_DURATION,
+            VibrationEffect.DEFAULT_AMPLITUDE
+        )
+        vibrator.vibrate(effect)
     }
 
     private fun onCameraOpenFailed() {
@@ -260,5 +280,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 "lens focus distance ${viewModel.lensFocusDistanceFlow.value}\n" +
                 "lock state ${viewModel.lockStateFlow.value}"
         binding.debugView.text = text
+    }
+
+    companion object{
+        private const val VIBRATE_DURATION = 2L
     }
 }
