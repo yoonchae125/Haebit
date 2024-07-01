@@ -104,6 +104,9 @@ class CameraValueListViewModel(
 
     fun onClickCameraValueList(type: CameraValueType) {
         mutableUnSelectableValueTypeFlow.update { type }
+
+        val value = getUserCameraValueMutableFlow(type).value
+        updateUnSelectableCameraValue(value)
     }
 
     private fun getUserCameraValueMutableFlow(type: CameraValueType): MutableStateFlow<CameraValue> =
