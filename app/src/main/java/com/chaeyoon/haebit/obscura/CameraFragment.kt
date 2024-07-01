@@ -22,6 +22,7 @@ import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
+import com.chaeyoon.haebit.obscura.view.model.Position
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
@@ -51,6 +52,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private val mutex = Mutex()
     private var delayLockRectHideJob: Job? = null
+
+    private val lockRectSize by lazy { resources.getDimension(R.dimen.camera_lock_rect_size) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -167,7 +170,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
             viewModel.lockIconVisibilityFlow.launchAndCollect(this, ::updateUnlockButtonVisibility)
 
-            viewModel.lockRectUIStateFlow.launchAndCollect(this, ::lockState)
+            viewModel.lockRectUIStateFlow.launchAndCollect(this, ::updateLockState)
         }
     }
 
@@ -179,18 +182,17 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         binding.unlockButton.isVisible = isVisible
     }
 
-    private fun lockState(lockUIState: LockRectUIState) {
+    private fun updateLockState(lockUIState: LockRectUIState) {
+        updateExposureTextColor(lockUIState is LockRectUIState.LockRectLockedState)
         when (lockUIState) {
             is LockRectUIState.LockRectProcessingState -> {
-                binding.lockRegion.x = lockUIState.position.x - resources.getDimension(R.dimen.camera_lock_rect_size)/2
-                binding.lockRegion.y = lockUIState.position.y- resources.getDimension(R.dimen.camera_lock_rect_size)/2
+                updateLockRegionPosition(position = lockUIState.position)
                 binding.lockRegion.setBackgroundResource(lockUIState.drawableRes)
                 showRectFor()
             }
 
             is LockRectUIState.LockRectLockedState -> {
-                binding.lockRegion.x = lockUIState.position.x- resources.getDimension(R.dimen.camera_lock_rect_size)/2
-                binding.lockRegion.y = lockUIState.position.y- resources.getDimension(R.dimen.camera_lock_rect_size)/2
+                updateLockRegionPosition(position = lockUIState.position)
                 binding.lockRegion.setBackgroundResource(lockUIState.drawableRes)
                 showRectFor(lockUIState.visibleTimeMillis)
             }
@@ -201,6 +203,19 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
     }
 
+    private fun updateLockRegionPosition(position: Position) {
+        binding.lockRegion.x = position.x - lockRectSize / 2
+        binding.lockRegion.y = position.y - lockRectSize / 2
+    }
+
+    private fun updateExposureTextColor(isLocked: Boolean) {
+        val textColor = if (isLocked) {
+            requireContext().getColor(R.color.center_value_locked)
+        } else {
+            requireContext().getColor(R.color.center_value_normal)
+        }
+        binding.exposureValueText.setTextColor(textColor)
+    }
 
     private fun showRectFor(visibleTimeMillis: Long = 0L) {
         viewLifecycleOwner.lifecycleScope.launch {
