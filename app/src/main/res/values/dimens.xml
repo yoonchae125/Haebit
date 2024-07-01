@@ -3,4 +3,5 @@
     <dimen name="camera_value_item_width">55dp</dimen>
     <dimen name="camera_value_item_height">36dp</dimen>
     <dimen name="camera_value_item_text_size">13sp</dimen>
+    <dimen name="camera_lock_rect_size">60dp</dimen>
 </resources>

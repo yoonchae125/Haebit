@@ -72,9 +72,6 @@ class CameraImpl private constructor(context: Context) : Camera {
     override val lockStateFlow: StateFlow<LockState> =
         lockStateMutableFlow.asStateFlow()
 
-    private val mutableIsLocked = MutableStateFlow(false)
-    override val isLockedFlow = mutableIsLocked.asStateFlow()
-
     // camera
     private val cameraManager: CameraManager =
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -215,7 +212,6 @@ class CameraImpl private constructor(context: Context) : Camera {
             null
         )
 
-        mutableIsLocked.update { true }
         lockStateMutableFlow.update { LockState.LOCKED }
     }
 
@@ -255,7 +251,6 @@ class CameraImpl private constructor(context: Context) : Camera {
             },
             cameraHandler
         )
-        mutableIsLocked.update { false }
         lockStateMutableFlow.update { LockState.UNLOCKED }
     }
 
