@@ -6,4 +6,6 @@
     <color name="selected_value">#FFF7CE46</color>
     <color name="center_value">#FFFFFFFF</color>
     <color name="center_red_dot">#FF0000</color>
+    <color name="lock_processing">#E00000</color>
+    <color name="lock_end">#00E000</color>
 </resources>

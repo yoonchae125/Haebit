@@ -10,10 +10,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import androidx.lifecycle.lifecycleScope
 import com.chaeyoon.haebit.BuildConfig
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
-import com.chaeyoon.haebit.obscura.core.LockState
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
@@ -21,10 +21,16 @@ import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
+import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * CameraFragment
@@ -42,6 +48,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private lateinit var permissionChecker: PermissionChecker
+
+    private val mutex = Mutex()
+    private var delayLockRectHideJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -156,9 +165,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         viewLifecycleOwner.launchAndRepeatOnLifecycle {
             viewModel.exposureValueTextFlow.launchAndCollect(this, ::updateExposureValueText)
 
-            viewModel.lockIconVisibility.launchAndCollect(this, ::updateUnlockButtonVisibility)
+            viewModel.lockIconVisibilityFlow.launchAndCollect(this, ::updateUnlockButtonVisibility)
 
-            viewModel.lockStateFlow.launchAndCollect(this, ::lockState)
+            viewModel.lockRectUIStateFlow.launchAndCollect(this, ::lockState)
         }
     }
 
@@ -170,18 +179,48 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         binding.unlockButton.isVisible = isVisible
     }
 
-    private fun lockState(lockState: LockState) {
-        when (lockState) {
-            LockState.LOCK_PROCESSING -> {
-                // TODO: show processing rect
+    private fun lockState(lockUIState: LockRectUIState) {
+        when (lockUIState) {
+            is LockRectUIState.LockRectProcessingState -> {
+                binding.lockRegion.x = lockUIState.position.x - resources.getDimension(R.dimen.camera_lock_rect_size)/2
+                binding.lockRegion.y = lockUIState.position.y- resources.getDimension(R.dimen.camera_lock_rect_size)/2
+                binding.lockRegion.setBackgroundResource(lockUIState.drawableRes)
+                showRectFor()
             }
-            LockState.LOCKED -> {
-                // TODO: show locked rect
+
+            is LockRectUIState.LockRectLockedState -> {
+                binding.lockRegion.x = lockUIState.position.x- resources.getDimension(R.dimen.camera_lock_rect_size)/2
+                binding.lockRegion.y = lockUIState.position.y- resources.getDimension(R.dimen.camera_lock_rect_size)/2
+                binding.lockRegion.setBackgroundResource(lockUIState.drawableRes)
+                showRectFor(lockUIState.visibleTimeMillis)
             }
-            LockState.UNLOCKED -> {
-                // TODO: hide rect
+
+            is LockRectUIState.LockRectUnlockedState -> {
+                hideRect()
             }
         }
+    }
+
+
+    private fun showRectFor(visibleTimeMillis: Long = 0L) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            mutex.withLock {
+                delayLockRectHideJob?.cancel()
+                binding.lockRegion.isVisible = true
+                if (visibleTimeMillis > 0) {
+                    // delay job
+                    delayLockRectHideJob = launch {
+                        delay(visibleTimeMillis)
+                        hideRect()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun hideRect() {
+        binding.lockRegion.isVisible = false
+
     }
 
     private fun displayDebugView() {
