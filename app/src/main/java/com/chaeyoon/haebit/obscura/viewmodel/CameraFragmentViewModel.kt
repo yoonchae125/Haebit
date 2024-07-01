@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.chaeyoon.haebit.obscura.core.Camera
 import com.chaeyoon.haebit.obscura.core.CameraImpl
 import com.chaeyoon.haebit.obscura.CameraFragment
+import com.chaeyoon.haebit.obscura.core.LockState
 import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
 import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,7 @@ class CameraFragmentViewModel(
     val lockStateFlow = camera.lockStateFlow
 
     val exposureValueTextFlow: Flow<String> = camera.exposureValueFlow.map { it.toEVTextFormat() }
-    val lockIconVisibility: StateFlow<Boolean> = camera.isLockedFlow
+    val lockIconVisibility: Flow<Boolean> = camera.lockStateFlow.map { it == LockState.LOCKED }
 
     fun setCameraOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit) {
         camera.setOutView(outView, onCameraOpenFailed)

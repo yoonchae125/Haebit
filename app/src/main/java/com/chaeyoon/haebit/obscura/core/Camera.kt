@@ -9,10 +9,9 @@ interface Camera {
     val isoFlow: StateFlow<Float>
     val shutterSpeedFlow: StateFlow<Float>
     val exposureValueFlow: StateFlow<Float>
-    val isLockedFlow: StateFlow<Boolean>
+    val lockStateFlow: StateFlow<LockState>
     // for debug
     val lensFocusDistanceFlow: StateFlow<Float>
-    val lockStateFlow: StateFlow<LockState>
 
     fun setOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit)
 

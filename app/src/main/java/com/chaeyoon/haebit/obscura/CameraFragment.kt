@@ -13,6 +13,7 @@ import androidx.lifecycle.get
 import com.chaeyoon.haebit.BuildConfig
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
+import com.chaeyoon.haebit.obscura.core.LockState
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
@@ -153,12 +154,32 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun collectViewModel() {
         viewLifecycleOwner.launchAndRepeatOnLifecycle {
-            viewModel.exposureValueTextFlow.launchAndCollect(this) { text ->
-                binding.exposureValueText.text = text
-            }
+            viewModel.exposureValueTextFlow.launchAndCollect(this, ::updateExposureValueText)
 
-            viewModel.lockIconVisibility.launchAndCollect(this) { isVisible ->
-                binding.unlockButton.isVisible = isVisible
+            viewModel.lockIconVisibility.launchAndCollect(this, ::updateUnlockButtonVisibility)
+
+            viewModel.lockStateFlow.launchAndCollect(this, ::lockState)
+        }
+    }
+
+    private fun updateExposureValueText(text: String) {
+        binding.exposureValueText.text = text
+    }
+
+    private fun updateUnlockButtonVisibility(isVisible: Boolean) {
+        binding.unlockButton.isVisible = isVisible
+    }
+
+    private fun lockState(lockState: LockState) {
+        when (lockState) {
+            LockState.LOCK_PROCESSING -> {
+                // TODO: show processing rect
+            }
+            LockState.LOCKED -> {
+                // TODO: show locked rect
+            }
+            LockState.UNLOCKED -> {
+                // TODO: hide rect
             }
         }
     }
