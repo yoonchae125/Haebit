@@ -5,15 +5,29 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
 import android.hardware.camera2.params.MeteringRectangle
+import android.util.Log
 import androidx.core.graphics.toRect
 import com.chaeyoon.haebit.obscura.utils.CameraCoordinateTransformer
 
+private const val TAG = "CameraExtensions"
 internal fun CameraCoordinateTransformer.getTouchLockRegion(
     x: Float,
     y: Float,
-    size: Int
+    size: Int,
+    maxWidth: Int,
+    maxHeight: Int
 ): MeteringRectangle {
-    val lockRect = toCameraSpace(RectF(x - size, y - size, x + size, y + size))
+
+    val touchRect = RectF(
+        (x - size).coerceIn(0f, maxWidth.toFloat()),
+        (y - size).coerceIn(0f, maxHeight.toFloat()),
+        (x + size).coerceIn(0f, maxWidth.toFloat()),
+        (y + size).coerceIn(0f, maxHeight.toFloat())
+    )
+    val lockRect = toCameraSpace(touchRect)
+
+    Log.d(TAG, "touch$touchRect")
+    Log.d(TAG, "lock$lockRect")
 
     return MeteringRectangle(
         lockRect.toRect(),

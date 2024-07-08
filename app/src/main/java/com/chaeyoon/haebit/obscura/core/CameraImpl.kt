@@ -451,7 +451,13 @@ class CameraImpl private constructor(context: Context) : Camera {
     }
 
     private fun setLockRegion(characteristics: CameraCharacteristics, x: Float, y: Float) {
-        touchLockRegion = cameraCoordinateTransformer.getTouchLockRegion(x, y, LOCK_REGION_SIZE)
+        touchLockRegion = cameraCoordinateTransformer.getTouchLockRegion(
+            x,
+            y,
+            LOCK_REGION_SIZE,
+            surfaceView!!.width,
+            surfaceView!!.height
+        )
 
         if (characteristics.isMeteringAreaAFSupported()) {
             previewRequestBuilder.set(
