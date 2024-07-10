@@ -1,7 +1,6 @@
 package com.chaeyoon.haebit.obscura
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -9,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -49,7 +47,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private val viewModel: CameraFragmentViewModel by lazy {
         ViewModelProvider(
             this,
-            CameraFragmentViewModel.Factory(requireContext())
+            CameraFragmentViewModel.Factory(requireContext(), lifecycleScope)
         ).get()
     }
 
@@ -117,15 +115,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             if (actionMasked != MotionEvent.ACTION_DOWN) {
                 return@setOnTouchListener false
             }
-            vibrate()
             viewModel.lockCamera(event.x, event.y)
             false
         }
 
         binding.unlockButton.setOnClickListener {
-            vibrate()
             viewModel.unlockCamera()
-            vibrate()
         }
     }
 
@@ -148,7 +143,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         val binderViewModel: CameraValueListViewModel =
             ViewModelProvider(
                 this,
-                CameraValueListViewModel.Factory(requireContext())
+                CameraValueListViewModel.Factory(requireContext(), lifecycleScope)
             ).get()
 
         CameraValueListBinder(
@@ -191,6 +186,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             viewModel.lockIconVisibilityFlow.launchAndCollect(this, ::updateUnlockButtonVisibility)
 
             viewModel.lockRectUIStateFlow.launchAndCollect(this, ::updateLockState)
+
+            viewModel.vibrateFlow.launchAndCollect(this){
+                vibrate()
+            }
         }
     }
 
@@ -282,7 +281,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         binding.debugView.text = text
     }
 
-    companion object{
+    companion object {
         private const val VIBRATE_DURATION = 2L
     }
 }

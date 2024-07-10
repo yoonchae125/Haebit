@@ -15,6 +15,7 @@ import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.nearest
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -116,9 +117,12 @@ class CameraValueListViewModel(
             CameraValueType.SHUTTER_SPEED -> mutableUserShutterSpeedFlow
         }
 
-    class Factory(private val context: Context) : ViewModelProvider.NewInstanceFactory() {
+    class Factory(
+        private val context: Context,
+        private val coroutineScope: CoroutineScope
+    ) : ViewModelProvider.NewInstanceFactory() {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            CameraValueListViewModel(CameraImpl.getInstance(context)) as T
+            CameraValueListViewModel(CameraImpl.getInstance(context, coroutineScope)) as T
     }
 }
