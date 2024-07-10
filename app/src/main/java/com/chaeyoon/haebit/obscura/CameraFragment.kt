@@ -2,8 +2,6 @@ package com.chaeyoon.haebit.obscura
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -19,7 +17,6 @@ import com.chaeyoon.haebit.databinding.FragmentCameraBinding
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
-import com.chaeyoon.haebit.obscura.utils.extensions.getVibrator
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
@@ -29,6 +26,7 @@ import com.chaeyoon.haebit.obscura.view.model.Position
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
+import com.chaeyoon.haebit.util.VibrateManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
@@ -52,7 +50,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private lateinit var permissionChecker: PermissionChecker
-    private val vibrator by lazy { requireContext().getVibrator() }
+    private val vibrator by lazy { VibrateManager(requireContext()) }
 
     private val mutex = Mutex()
     private var delayLockRectHideJob: Job? = null
@@ -124,17 +122,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
     }
 
-    private fun vibrate() {
-        val vibrator = vibrator?.takeIf(Vibrator::hasVibrator)
-            ?: return
-
-        val effect = VibrationEffect.createOneShot(
-            VIBRATE_DURATION,
-            VibrationEffect.DEFAULT_AMPLITUDE
-        )
-        vibrator.vibrate(effect)
-    }
-
     private fun onCameraOpenFailed() {
         requireActivity().finish()
     }
@@ -187,8 +174,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
             viewModel.lockRectUIStateFlow.launchAndCollect(this, ::updateLockState)
 
-            viewModel.vibrateFlow.launchAndCollect(this){
-                vibrate()
+            viewModel.vibrateFlow.launchAndCollect(this) {
+                vibrator.vibrate()
             }
         }
     }
@@ -279,9 +266,5 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 "lens focus distance ${viewModel.lensFocusDistanceFlow.value}\n" +
                 "lock state ${viewModel.lockStateFlow.value}"
         binding.debugView.text = text
-    }
-
-    companion object {
-        private const val VIBRATE_DURATION = 2L
     }
 }
