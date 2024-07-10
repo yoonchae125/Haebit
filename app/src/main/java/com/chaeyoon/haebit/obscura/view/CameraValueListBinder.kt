@@ -13,6 +13,7 @@ import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
+import com.chaeyoon.haebit.util.VibrateManager
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
@@ -41,6 +42,8 @@ class CameraValueListBinder(
     )
     private val centerScroller = CenterSmoothScroller(context)
     private val userCameraValueFlow = viewModel.getUserCameraValueFlow(type)
+
+    private val vibrator = VibrateManager(context)
 
     init {
         initRecyclerView()
@@ -83,6 +86,7 @@ class CameraValueListBinder(
                 centerScroller
             ) { position ->
                 viewModel.updateUserCameraValue(type, valueList[position])
+                vibrator.vibrate()
             }
         )
     }

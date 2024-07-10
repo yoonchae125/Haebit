@@ -40,8 +40,11 @@ import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
 import com.google.android.gms.common.util.concurrent.HandlerExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -51,7 +54,10 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 
-class CameraImpl private constructor(context: Context) : Camera {
+class CameraImpl private constructor(
+    context: Context,
+    private val coroutineScope: CoroutineScope
+) : Camera {
     // camera values
     private var mutableAperture = 0f
     private val isoMutableFlow = MutableStateFlow(0f)
@@ -62,6 +68,10 @@ class CameraImpl private constructor(context: Context) : Camera {
     override val isoFlow: StateFlow<Float> = isoMutableFlow.asStateFlow()
     override val shutterSpeedFlow: StateFlow<Float> = shutterSpeedMutableFlow.asStateFlow()
     override val exposureValueFlow: StateFlow<Float> = exposureValueMutableFlow.asStateFlow()
+
+    private val mutableVibrateFlow = MutableSharedFlow<Unit>()
+    override val vibrateFlow: SharedFlow<Unit> = mutableVibrateFlow.asSharedFlow()
+
     private val lightMeterCalculator = LightMeterCalculator()
 
     // debug
@@ -138,13 +148,16 @@ class CameraImpl private constructor(context: Context) : Camera {
             CameraCoordinateTransformer(characteristics, surfaceRect)
     }
 
-    override fun startCamera(coroutineScope: CoroutineScope) {
+    override fun startCamera() {
         surfaceView?.rootView?.post {
             internalStartCamera(coroutineScope)
         }
     }
 
-    override fun lock(x: Float, y: Float, coroutineScope: CoroutineScope) {
+    override fun lock(x: Float, y: Float) {
+        coroutineScope.launch {
+            mutableVibrateFlow.emit(Unit)
+        }
         unLock()
 
         lockStateMutableFlow.update { LockState.LOCK_PROCESSING }
@@ -213,6 +226,9 @@ class CameraImpl private constructor(context: Context) : Camera {
         )
 
         lockStateMutableFlow.update { LockState.LOCKED }
+        coroutineScope.launch {
+            mutableVibrateFlow.emit(Unit)
+        }
     }
 
     private fun offAutoControlMode() {
@@ -230,7 +246,13 @@ class CameraImpl private constructor(context: Context) : Camera {
 //        )
     }
 
-    override fun unLock() {
+    override fun unLock(needVibrate: Boolean) {
+        if (needVibrate) {
+            coroutineScope.launch {
+                mutableVibrateFlow.emit(Unit)
+            }
+        }
+
         captureSession?.stopRepeating()
 
         cancelTriggerLock()
@@ -502,9 +524,9 @@ class CameraImpl private constructor(context: Context) : Camera {
         private const val LOCK_REGION_SIZE = 150
 
         private var instance: CameraImpl? = null
-        fun getInstance(context: Context): CameraImpl {
+        fun getInstance(context: Context, coroutineScope: CoroutineScope): CameraImpl {
             return instance ?: synchronized(this) {
-                CameraImpl(context).also {
+                CameraImpl(context, coroutineScope).also {
                     instance = it
                 }
             }

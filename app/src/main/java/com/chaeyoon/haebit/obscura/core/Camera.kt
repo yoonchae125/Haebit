@@ -2,6 +2,7 @@ package com.chaeyoon.haebit.obscura.core
 
 import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface Camera {
@@ -10,14 +11,15 @@ interface Camera {
     val shutterSpeedFlow: StateFlow<Float>
     val exposureValueFlow: StateFlow<Float>
     val lockStateFlow: StateFlow<LockState>
+    val vibrateFlow: SharedFlow<Unit>
     // for debug
     val lensFocusDistanceFlow: StateFlow<Float>
 
     fun setOutView(outView: AutoFitSurfaceView, onCameraOpenFailed: () -> Unit)
 
-    fun startCamera(coroutineScope: CoroutineScope)
+    fun startCamera()
 
-    fun lock(x: Float, y: Float, coroutineScope: CoroutineScope)
+    fun lock(x: Float, y: Float)
 
-    fun unLock()
+    fun unLock(needVibrate:Boolean = true)
 }
