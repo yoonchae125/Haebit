@@ -45,8 +45,8 @@ class CameraValueListViewModel(
         aperture.nearest(apertureValues)
     )
 
-    private val mutableUnSelectableCameraValueTextFlow = MutableStateFlow(isoFlow.value.toString())
-    val unSelectableCameraValueTextFlow: StateFlow<String> =
+    private val mutableUnSelectableCameraValueTextFlow = MutableStateFlow(isoFlow.value.nearest(isoValues))
+    val unSelectableCameraValueTextFlow: StateFlow<CameraValue> =
         mutableUnSelectableCameraValueTextFlow.asStateFlow()
 
     private val mutableUnSelectableValueTypeFlow = MutableStateFlow(CameraValueType.ISO)
@@ -67,7 +67,7 @@ class CameraValueListViewModel(
     private fun updateUnSelectableCameraValue(value: CameraValue) {
         val unSelectableType = unSelectableValueTypeFlow.value
         getUserCameraValueMutableFlow(unSelectableType).update { value }
-        mutableUnSelectableCameraValueTextFlow.update { value.getText() }
+        mutableUnSelectableCameraValueTextFlow.update { value }
     }
 
     fun updateUserCameraValue(type: CameraValueType, value: CameraValue) {
