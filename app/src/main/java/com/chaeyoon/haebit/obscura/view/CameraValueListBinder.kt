@@ -27,8 +27,7 @@ class CameraValueListBinder(
     private val cameraValueListView: RecyclerView,
     private val valueList: List<CameraValue>,
     private val type: CameraValueType,
-    private val viewModel: CameraValueListViewModel,
-    private val updateCenterValue: (String) -> Unit
+    private val viewModel: CameraValueListViewModel
 ) {
     private val layoutManager =
         LinearLayoutManager(
@@ -98,15 +97,12 @@ class CameraValueListBinder(
                 .launchAndCollect(this) { unSelectable ->
                     disableTouchEvent(unSelectable)
                     adapter.submitList(getDataList())
+
                 }
 
-            userCameraValueFlow.launchAndCollect(this) {
+            userCameraValueFlow.launchAndCollect(this) { value ->
                 adapter.submitList(getDataList())
-                scrollToCenter(it)
-            }
-
-            viewModel.unSelectableCameraValueTextFlow.launchAndCollect(this) { centerText ->
-                updateCenterValue(centerText)
+                scrollToCenter(value)
             }
         }
     }

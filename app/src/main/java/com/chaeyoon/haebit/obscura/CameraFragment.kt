@@ -14,12 +14,14 @@ import androidx.lifecycle.lifecycleScope
 import com.chaeyoon.haebit.BuildConfig
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
+import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
+import com.chaeyoon.haebit.obscura.view.animator.CenterValueAnimator
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
 import com.chaeyoon.haebit.obscura.view.model.Position
@@ -48,6 +50,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             CameraFragmentViewModel.Factory(requireContext(), lifecycleScope)
         ).get()
     }
+    private val binderViewModel: CameraValueListViewModel by lazy {
+        ViewModelProvider(
+            this,
+            CameraValueListViewModel.Factory(requireContext(), lifecycleScope)
+        ).get()
+    }
 
     private lateinit var permissionChecker: PermissionChecker
     private val vibrator by lazy { VibrateManager(requireContext()) }
@@ -56,6 +64,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var delayLockRectHideJob: Job? = null
 
     private val lockRectSize by lazy { resources.getDimension(R.dimen.camera_lock_rect_size) }
+
+    private var centerCameraValue: CameraValue? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -127,20 +137,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun initCameraValueListBinder() {
-        val binderViewModel: CameraValueListViewModel =
-            ViewModelProvider(
-                this,
-                CameraValueListViewModel.Factory(requireContext(), lifecycleScope)
-            ).get()
-
         CameraValueListBinder(
             requireContext(),
             viewLifecycleOwner,
-            binding.apertureList,
-            apertureValues,
+            binding.apertureList, apertureValues,
             CameraValueType.APERTURE,
-            binderViewModel,
-            ::updateCenterValueText
+            binderViewModel
         )
         CameraValueListBinder(
             requireContext(),
@@ -148,8 +150,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             binding.shutterSpeedList,
             shutterSpeedValues,
             CameraValueType.SHUTTER_SPEED,
-            binderViewModel,
-            ::updateCenterValueText
+            binderViewModel
         )
         CameraValueListBinder(
             requireContext(),
@@ -157,13 +158,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             binding.isoList,
             isoValues,
             CameraValueType.ISO,
-            binderViewModel,
-            ::updateCenterValueText
+            binderViewModel
         )
-    }
-
-    private fun updateCenterValueText(text: String) {
-        binding.selectedCameraValueText.text = text
     }
 
     private fun collectViewModel() {
@@ -177,7 +173,24 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             viewModel.vibrateFlow.launchAndCollect(this) {
                 vibrator.vibrate()
             }
+
+            binderViewModel.unSelectableCameraValueTextFlow.launchAndCollect(
+                this,
+                ::setCenterCameraValue
+            )
         }
+    }
+
+    private fun setCenterCameraValue(cameraValue: CameraValue) {
+        if (centerCameraValue == cameraValue) return
+
+        CenterValueAnimator.getAnimator(
+            targetView = binding.selectedCameraValueText,
+            currentCameraValue = centerCameraValue,
+            targetCameraValue = cameraValue
+        ).start()
+
+        centerCameraValue = cameraValue
     }
 
     private fun updateExposureValueText(text: String) {
