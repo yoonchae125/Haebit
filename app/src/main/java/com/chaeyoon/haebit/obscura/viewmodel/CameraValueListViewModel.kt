@@ -71,6 +71,7 @@ class CameraValueListViewModel(
     }
 
     fun updateUserCameraValue(type: CameraValueType, value: CameraValue) {
+        if (type == unSelectableValueTypeFlow.value) return
         getUserCameraValueMutableFlow(type).update { value }
         val unSelectableType = unSelectableValueTypeFlow.value
         if (unSelectableType != type) {
@@ -100,6 +101,7 @@ class CameraValueListViewModel(
             ).nearest(shutterSpeedValues)
         }
         updateUnSelectableCameraValue(value)
+        getUserCameraValueMutableFlow(unSelectableType).update { value }
     }
 
 
