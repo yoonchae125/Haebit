@@ -19,6 +19,8 @@ interface Camera {
 
     fun startCamera()
 
+    fun closeCamera()
+
     fun lock(x: Float, y: Float)
 
     fun unLock(needVibrate:Boolean = true)

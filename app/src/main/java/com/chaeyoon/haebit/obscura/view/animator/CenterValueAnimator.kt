@@ -19,17 +19,18 @@ object CenterValueAnimator {
         targetCameraValue: CameraValue
     ): Animator {
         targetView.clearAnimation()
-        targetView.text = currentCameraValue?.getText()
+        targetView.text = currentCameraValue?.getText(true)
 
         if (currentCameraValue?.type != targetCameraValue.type) {
             return fadeAnimator(
                 targetView = targetView,
-                text = targetCameraValue.getText()
+                text = targetCameraValue.getText(true)
             )
         }
 
         val getText: (String) -> String = { animValue ->
-            targetCameraValue.prefix + animValue + targetCameraValue.suffix
+            val space = if (targetCameraValue is FractionCameraValue) " " else ""
+            targetCameraValue.prefix + space + animValue + targetCameraValue.suffix
         }
 
         return when {
@@ -55,10 +56,9 @@ object CenterValueAnimator {
                         floatValueAnimator(
                             targetView = targetView,
                             from = currentCameraValue.value,
-                            to = targetCameraValue.value
-                        ) { animValue ->
-                            targetCameraValue.suffix + animValue + targetCameraValue.prefix
-                        }
+                            to = targetCameraValue.value,
+                            getText = getText
+                        )
                     } else {
                         intValueAnimator(
                             targetView = targetView,
@@ -74,7 +74,7 @@ object CenterValueAnimator {
                     currentCameraValue is FractionCameraValue && targetCameraValue is NormalCameraValue -> {
                 fadeAnimator(
                     targetView = targetView,
-                    text = targetCameraValue.getText()
+                    text = targetCameraValue.getText(true)
                 )
             }
 
