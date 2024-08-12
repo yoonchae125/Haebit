@@ -3,6 +3,7 @@ package com.chaeyoon.haebit.obscura.viewmodel
 import com.chaeyoon.haebit.CoroutineDispatcherTestRule
 import com.chaeyoon.haebit.obscura.core.Camera
 import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
+import com.chaeyoon.haebit.obscura.utils.constants.FractionCameraValue
 import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,10 @@ class CameraValueListViewModelTest {
     fun test2() {
         testInstance.updateUserCameraValue(
             CameraValueType.SHUTTER_SPEED,
-            CameraValue(1 / 8000f, "")
+            FractionCameraValue(
+                CameraValueType.SHUTTER_SPEED,
+                1 / 8000f
+            )
         )
         // ev 8.79
         // f16

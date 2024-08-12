@@ -83,6 +83,8 @@ class CameraImpl private constructor(
         lockStateMutableFlow.asStateFlow()
 
     // camera
+    private var isCameraOpened = false
+    private var camera: CameraDevice? = null
     private val cameraManager: CameraManager =
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     private lateinit var cameraId: String
@@ -154,7 +156,15 @@ class CameraImpl private constructor(
         }
     }
 
+    override fun closeCamera() {
+        camera?.close()
+        camera = null
+        isCameraOpened = false
+    }
+
     override fun lock(x: Float, y: Float) {
+        if (!isCameraOpened) return
+
         coroutineScope.launch {
             mutableVibrateFlow.emit(Unit)
         }
@@ -313,7 +323,9 @@ class CameraImpl private constructor(
     private fun internalStartCamera(coroutineScope: CoroutineScope) =
         coroutineScope.launch(Dispatchers.Main) {
             val nonNullView = requireNotNull(surfaceView)
-            val camera = openCamera(cameraId, onCameraOpenFailed)
+            val camera = openCamera(cameraId, onCameraOpenFailed).also {
+                camera = it
+            }
 
             // Creates list of Surfaces where the camera will output frames
             val targets = listOf(nonNullView.holder.surface)
@@ -338,6 +350,8 @@ class CameraImpl private constructor(
             mutableAperture = previewRequestBuilder.get(CaptureRequest.LENS_APERTURE)!!
 
             startCameraPreview()
+
+            isCameraOpened = true
         }
 
     private fun getCameraId(): String? {

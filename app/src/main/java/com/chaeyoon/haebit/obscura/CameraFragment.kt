@@ -93,13 +93,17 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     override fun onResume() {
         super.onResume()
-
         viewModel.startCamera()
     }
 
     override fun onStart() {
         super.onStart()
         permissionChecker.checkCameraPermissions()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.closeCamera()
     }
 
     override fun onDestroy() {
@@ -198,7 +202,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun updateUnlockButtonVisibility(isVisible: Boolean) {
-        binding.unlockButton.isVisible = isVisible
+        binding.unlockButton.visibility = if(isVisible)View.VISIBLE else View.INVISIBLE
     }
 
     private fun updateLockState(lockUIState: LockRectUIState) {

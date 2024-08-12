@@ -52,6 +52,10 @@ class CameraFragmentViewModel(
         camera.startCamera()
     }
 
+    fun closeCamera() {
+        camera.closeCamera()
+    }
+
     fun lockCamera(x: Float, y: Float) {
         lastTouchedPosition = Position(x, y)
         camera.lock(x, y)

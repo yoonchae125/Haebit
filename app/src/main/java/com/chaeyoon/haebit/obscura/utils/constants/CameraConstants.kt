@@ -136,7 +136,7 @@ interface CameraValue {
     val prefix: String
     val suffix: String
     val decimal: Boolean
-    fun getText(): String {
+    fun getText(forCenter: Boolean = false): String {
         val number = if (decimal) {
             value.toOneDecimalPlaces()
         } else {
@@ -162,7 +162,8 @@ data class FractionCameraValue(
     override val decimal: Boolean = false,
     val denominator: Int = 1
 ) : CameraValue {
-    override fun getText(): String {
-        return prefix + denominator + suffix
+    override fun getText(forCenter: Boolean): String {
+        val space = if (forCenter) " " else ""
+        return prefix + space + denominator + suffix
     }
 }
