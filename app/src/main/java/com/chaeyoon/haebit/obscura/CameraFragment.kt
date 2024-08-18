@@ -86,7 +86,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         initCameraValueListBinder()
         collectViewModel()
 
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.BUILD_TYPE == "debug") {
             displayDebugView()
         }
     }
@@ -202,7 +202,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun updateUnlockButtonVisibility(isVisible: Boolean) {
-        binding.unlockButton.visibility = if(isVisible)View.VISIBLE else View.INVISIBLE
+        binding.unlockButton.visibility = if (isVisible) View.VISIBLE else View.INVISIBLE
     }
 
     private fun updateLockState(lockUIState: LockRectUIState) {
@@ -262,6 +262,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun displayDebugView() {
+        binding.debugView.isVisible = true
         viewLifecycleOwner.launchAndRepeatOnLifecycle {
             combine(
                 viewModel.isoFlow,
