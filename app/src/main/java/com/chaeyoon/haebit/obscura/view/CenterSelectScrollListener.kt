@@ -39,8 +39,9 @@ class CenterSelectScrollListener(
         val centerView = findCenterView(layoutManager)
         centerView?.let {
             val position = layoutManager.getPosition(it)
-            if (position == selectedPosition) return
-            onItemSelected(position)
+            if (position != selectedPosition) {
+                onItemSelected(position)
+            }
             if (scrollToCenter) {
                 scrollToCenter(position)
             }
