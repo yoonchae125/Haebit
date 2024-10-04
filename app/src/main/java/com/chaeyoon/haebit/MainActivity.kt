@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         installSplashScreen()
 
+        setContentView(ActivityMainBinding.inflate(layoutInflater).root)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
 
@@ -38,7 +39,5 @@ class MainActivity : AppCompatActivity() {
         }
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        setContentView(ActivityMainBinding.inflate(layoutInflater).root)
     }
 }
