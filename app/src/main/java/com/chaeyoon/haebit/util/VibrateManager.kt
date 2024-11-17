@@ -14,12 +14,13 @@ class VibrateManager(context: Context) {
 
         val effect = VibrationEffect.createOneShot(
             VIBRATE_DURATION,
-            VibrationEffect.DEFAULT_AMPLITUDE
+            MAX_AMPLITUDE
         )
         vibrator.vibrate(effect)
     }
 
     companion object {
         private const val VIBRATE_DURATION = 2L
+        private const val MAX_AMPLITUDE = 255
     }
 }
