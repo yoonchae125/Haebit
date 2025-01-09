@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Haebit</string>
+    <string name="app_name">illumeter</string>
 
     <!-- Alert camera permission denied -->
     <string name="alert_camera_permission_denied_title">Camera Access</string>
