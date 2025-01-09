@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.functions
+package com.chaeyoon.haebit.obscura.functions
 
 internal fun nanoSecondsToSeconds(nanoSeconds:Long):Float =
     nanoSeconds/NANO_SECONDS

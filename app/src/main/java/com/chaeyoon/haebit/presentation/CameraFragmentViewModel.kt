@@ -1,18 +1,18 @@
-package com.chaeyoon.haebit.obscura.viewmodel
+package com.chaeyoon.haebit.presentation
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.chaeyoon.haebit.obscura.core.Camera
 import com.chaeyoon.haebit.obscura.core.CameraImpl
-import com.chaeyoon.haebit.obscura.CameraFragment
+import com.chaeyoon.haebit.ui.CameraFragment
 import com.chaeyoon.haebit.obscura.core.LockState
-import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
-import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
+import com.chaeyoon.haebit.common.extensions.toTwoDecimalPlaces
+import com.chaeyoon.haebit.presentation.model.LockRectUIState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
-import com.chaeyoon.haebit.obscura.view.model.Position
+import com.chaeyoon.haebit.ui.view.AutoFitSurfaceView
+import com.chaeyoon.haebit.common.model.Position
 import kotlinx.coroutines.CoroutineScope
 
 /**

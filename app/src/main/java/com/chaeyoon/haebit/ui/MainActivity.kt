@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit
+package com.chaeyoon.haebit.ui
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo

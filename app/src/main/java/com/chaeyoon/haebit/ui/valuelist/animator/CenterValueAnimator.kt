@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view.animator
+package com.chaeyoon.haebit.ui.valuelist.animator
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
@@ -10,7 +10,7 @@ import androidx.core.animation.addListener
 import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
 import com.chaeyoon.haebit.obscura.utils.constants.FractionCameraValue
 import com.chaeyoon.haebit.obscura.utils.constants.NormalCameraValue
-import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
+import com.chaeyoon.haebit.common.extensions.toOneDecimalPlaces
 
 object CenterValueAnimator {
     fun getAnimator(

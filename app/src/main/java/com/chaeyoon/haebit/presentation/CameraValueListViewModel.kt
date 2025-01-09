@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.viewmodel
+package com.chaeyoon.haebit.presentation
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -10,10 +10,10 @@ import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
-import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
-import com.chaeyoon.haebit.obscura.utils.extensions.nearest
-import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
+import com.chaeyoon.haebit.ui.extensions.launchAndCollect
+import com.chaeyoon.haebit.common.extensions.nearest
+import com.chaeyoon.haebit.ui.valuelist.CameraValueListBinder
+import com.chaeyoon.haebit.presentation.model.CameraValueType
 import com.chaeyoon.lightmeter.LightMeterCalculator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

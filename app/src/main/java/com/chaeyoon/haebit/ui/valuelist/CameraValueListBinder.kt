@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view
+package com.chaeyoon.haebit.ui.valuelist
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,13 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
-import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
-import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
-import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
-import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
-import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
-import com.chaeyoon.haebit.util.VibrateManager
+import com.chaeyoon.haebit.ui.extensions.launchAndCollect
+import com.chaeyoon.haebit.ui.extensions.launchAndRepeatOnLifecycle
+import com.chaeyoon.haebit.presentation.CameraValueListViewModel
+import com.chaeyoon.haebit.presentation.model.CameraValueType
+import com.chaeyoon.haebit.presentation.model.CameraValueUIState
+import com.chaeyoon.haebit.ui.utils.VibrateManager
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 

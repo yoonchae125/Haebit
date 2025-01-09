@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view.model
+package com.chaeyoon.haebit.presentation.model
 
 import androidx.recyclerview.widget.DiffUtil
 import com.chaeyoon.haebit.obscura.utils.constants.CameraValue

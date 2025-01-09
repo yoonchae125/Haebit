@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.utils.extensions
+package com.chaeyoon.haebit.ui.extensions
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

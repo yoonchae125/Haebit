@@ -1,9 +1,10 @@
-package com.chaeyoon.haebit.util
+package com.chaeyoon.haebit.ui.utils
 
 import android.content.Context
+import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import com.chaeyoon.haebit.obscura.utils.extensions.getVibrator
+import android.os.VibratorManager
 
 class VibrateManager(context: Context) {
     private val vibrator = context.getVibrator()
@@ -19,6 +20,13 @@ class VibrateManager(context: Context) {
         vibrator.vibrate(effect)
     }
 
+    private fun Context.getVibrator(): Vibrator? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            getSystemService(VibratorManager::class.java)?.defaultVibrator
+        } else {
+            getSystemService(Vibrator::class.java)
+        }
+    }
     companion object {
         private const val VIBRATE_DURATION = 2L
         private const val MAX_AMPLITUDE = 255

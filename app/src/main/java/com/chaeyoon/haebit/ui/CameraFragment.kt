@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura
+package com.chaeyoon.haebit.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -18,17 +18,17 @@ import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
 import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
 import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
-import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
-import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
-import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
-import com.chaeyoon.haebit.obscura.view.animator.CenterValueAnimator
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
-import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
-import com.chaeyoon.haebit.obscura.view.model.Position
-import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
-import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
+import com.chaeyoon.haebit.ui.extensions.launchAndCollect
+import com.chaeyoon.haebit.ui.extensions.launchAndRepeatOnLifecycle
+import com.chaeyoon.haebit.ui.valuelist.CameraValueListBinder
+import com.chaeyoon.haebit.ui.valuelist.animator.CenterValueAnimator
+import com.chaeyoon.haebit.presentation.model.CameraValueType
+import com.chaeyoon.haebit.presentation.model.LockRectUIState
+import com.chaeyoon.haebit.common.model.Position
+import com.chaeyoon.haebit.presentation.CameraFragmentViewModel
+import com.chaeyoon.haebit.presentation.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker
-import com.chaeyoon.haebit.util.VibrateManager
+import com.chaeyoon.haebit.ui.utils.VibrateManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine

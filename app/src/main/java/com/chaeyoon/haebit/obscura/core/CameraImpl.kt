@@ -24,8 +24,7 @@ import android.os.HandlerThread
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
-import com.chaeyoon.lightmeter.LightMeterCalculator
-import com.chaeyoon.haebit.functions.nanoSecondsToSeconds
+import com.chaeyoon.haebit.obscura.functions.nanoSecondsToSeconds
 import com.chaeyoon.haebit.obscura.utils.CameraCoordinateTransformer
 import com.chaeyoon.haebit.obscura.utils.TimeoutManger
 import com.chaeyoon.haebit.obscura.utils.extensions.getTouchLockRegion
@@ -36,7 +35,7 @@ import com.chaeyoon.haebit.obscura.utils.extensions.isMeteringAreaAFSupported
 import com.chaeyoon.haebit.obscura.utils.functions.getPreviewOutputSize
 import com.chaeyoon.haebit.obscura.utils.functions.logAEState
 import com.chaeyoon.haebit.obscura.utils.functions.logAFState
-import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
+import com.chaeyoon.haebit.ui.view.AutoFitSurfaceView
 import com.google.android.gms.common.util.concurrent.HandlerExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

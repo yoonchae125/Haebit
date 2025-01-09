@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.utils
+package com.chaeyoon.haebit.permission
 
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException

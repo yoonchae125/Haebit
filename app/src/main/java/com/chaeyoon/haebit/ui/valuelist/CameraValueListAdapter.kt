@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view
+package com.chaeyoon.haebit.ui.valuelist
 
 import android.content.Context
 import android.graphics.Typeface
@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.ViewCameraValueItemBinding
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
-import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
-import com.chaeyoon.haebit.obscura.view.model.DIFF_CALLBACK
+import com.chaeyoon.haebit.presentation.model.CameraValueType
+import com.chaeyoon.haebit.presentation.model.CameraValueUIState
+import com.chaeyoon.haebit.presentation.model.DIFF_CALLBACK
 
 /**
  * CameraValueListAdapter is a RecyclerView adapter designed to display a list of camera values
