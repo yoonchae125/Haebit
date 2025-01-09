@@ -24,8 +24,8 @@ import android.os.HandlerThread
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
-import com.chaeyoon.haebit.lightmeter.LightMeterCalculator
-import com.chaeyoon.haebit.lightmeter.functions.nanoSecondsToSeconds
+import com.chaeyoon.lightmeter.LightMeterCalculator
+import com.chaeyoon.haebit.functions.nanoSecondsToSeconds
 import com.chaeyoon.haebit.obscura.utils.CameraCoordinateTransformer
 import com.chaeyoon.haebit.obscura.utils.TimeoutManger
 import com.chaeyoon.haebit.obscura.utils.extensions.getTouchLockRegion
@@ -72,7 +72,7 @@ class CameraImpl private constructor(
     private val mutableVibrateFlow = MutableSharedFlow<Unit>()
     override val vibrateFlow: SharedFlow<Unit> = mutableVibrateFlow.asSharedFlow()
 
-    private val lightMeterCalculator = LightMeterCalculator()
+    private val lightMeterCalculator = com.chaeyoon.lightmeter.LightMeterCalculator()
 
     // debug
     private val lensFocusDistanceMutableFlow = MutableStateFlow(0f)
@@ -515,7 +515,11 @@ class CameraImpl private constructor(
         val shutterSpeed =
             nanoSecondsToSeconds(result.get(CaptureResult.SENSOR_EXPOSURE_TIME)!!)
         val exposureValue =
-            lightMeterCalculator.calculateExposureValue(aperture, shutterSpeed, iso.toFloat())
+            lightMeterCalculator.calculateExposureValue(
+                aperture,
+                shutterSpeed,
+                iso.toFloat()
+            )
 
         isoMutableFlow.update { iso.toFloat() }
         shutterSpeedMutableFlow.update { shutterSpeed }

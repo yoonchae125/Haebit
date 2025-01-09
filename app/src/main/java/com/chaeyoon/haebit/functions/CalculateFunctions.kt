@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.lightmeter.functions
+package com.chaeyoon.haebit.functions
 
 internal fun nanoSecondsToSeconds(nanoSeconds:Long):Float =
     nanoSeconds/NANO_SECONDS

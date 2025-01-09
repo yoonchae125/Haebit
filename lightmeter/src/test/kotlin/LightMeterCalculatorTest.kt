@@ -1,8 +1,14 @@
-package com.chaeyoon.haebit.lightmeter
-
-import com.chaeyoon.haebit.obscura.utils.extensions.nearest
+import com.chaeyoon.lightmeter.LightMeterCalculator
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import kotlin.collections.flatMap
+import kotlin.collections.flatMapIndexed
+import kotlin.collections.flatten
+import kotlin.collections.map
+import kotlin.collections.mapNotNull
+import kotlin.collections.minByOrNull
+import kotlin.collections.zip
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
@@ -37,7 +43,11 @@ class LightMeterCalculatorTest {
             shutterSpeedValues
                 .mapNotNull { shutterSpeed ->
                     try {
-                        testInstance.calculateExposureValue(aperture, shutterSpeed, 100f)
+                        testInstance.calculateExposureValue(
+                            aperture,
+                            shutterSpeed,
+                            100f
+                        )
                     } catch (e: IllegalArgumentException) {
                         null
                     }
@@ -111,6 +121,6 @@ class LightMeterCalculatorTest {
     }
 
     private fun Float.nearest(among: List<Float>): Float {
-        return among.minByOrNull { kotlin.math.abs(it - this) } ?: this
+        return among.minByOrNull { abs(it - this) } ?: this
     }
 }

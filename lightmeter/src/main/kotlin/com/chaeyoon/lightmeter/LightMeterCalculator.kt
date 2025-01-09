@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.lightmeter
+package com.chaeyoon.lightmeter
 
 import kotlin.math.log2
 import kotlin.math.pow
