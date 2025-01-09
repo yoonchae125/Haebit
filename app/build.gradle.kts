@@ -41,6 +41,7 @@ android {
 
 dependencies {
     implementation(project(":lightmeter"))
+    implementation(project(":permission"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)

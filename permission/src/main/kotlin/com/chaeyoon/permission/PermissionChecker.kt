@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.permission
+package com.chaeyoon.permission
 
 import android.Manifest
 import android.content.Context

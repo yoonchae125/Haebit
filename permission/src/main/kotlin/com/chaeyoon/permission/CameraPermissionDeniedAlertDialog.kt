@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.permission
+package com.chaeyoon.permission
 
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
@@ -8,7 +8,6 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat.startActivity
-import com.chaeyoon.haebit.R
 
 class CameraPermissionDeniedAlertDialog(context: Context) {
     private val dialogBuilder = AlertDialog.Builder(context)

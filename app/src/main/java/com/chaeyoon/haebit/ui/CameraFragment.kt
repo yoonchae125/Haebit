@@ -27,7 +27,7 @@ import com.chaeyoon.haebit.presentation.model.LockRectUIState
 import com.chaeyoon.haebit.common.model.Position
 import com.chaeyoon.haebit.presentation.CameraFragmentViewModel
 import com.chaeyoon.haebit.presentation.CameraValueListViewModel
-import com.chaeyoon.haebit.permission.PermissionChecker
+import com.chaeyoon.permission.PermissionChecker
 import com.chaeyoon.haebit.ui.utils.VibrateManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -112,7 +112,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun initPermissionChecker() {
-        permissionChecker = PermissionChecker(this)
+        permissionChecker = com.chaeyoon.permission.PermissionChecker(this)
     }
 
     private fun initCamera() {
