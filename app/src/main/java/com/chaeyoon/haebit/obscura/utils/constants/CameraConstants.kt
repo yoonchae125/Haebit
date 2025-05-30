@@ -1,7 +1,7 @@
 package com.chaeyoon.haebit.obscura.utils.constants
 
-import com.chaeyoon.haebit.common.extensions.toOneDecimalPlaces
-import com.chaeyoon.haebit.presentation.model.CameraValueType
+import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
+import com.chaeyoon.haebit.obscura.view.model.CameraValueType
 
 internal val apertureValues = listOf(
     NormalCameraValue(type = CameraValueType.APERTURE, 1f, "ƒ"),

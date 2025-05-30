@@ -40,14 +40,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":lightmeter"))
-    implementation(project(":permission"))
-    implementation(project(":ui"))
-    implementation(project(":presentation"))
-
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
@@ -56,9 +53,11 @@ dependencies {
 
     // test
     testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.robolectric)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.core)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
+    testImplementation(kotlin("test"))
 }

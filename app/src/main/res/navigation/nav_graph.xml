@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/camera_fragment"
-        android:name="com.chaeyoon.haebit.ui.CameraFragment"
+        android:name="com.chaeyoon.haebit.obscura.CameraFragment"
         android:label="Camera">
     </fragment>
 </navigation>

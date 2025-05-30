@@ -1,6 +1,7 @@
 package com.chaeyoon.haebit.obscura.core
 
-import com.chaeyoon.haebit.ui.view.AutoFitSurfaceView
+import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
