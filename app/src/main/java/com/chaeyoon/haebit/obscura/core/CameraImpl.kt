@@ -36,7 +36,7 @@ import com.chaeyoon.haebit.obscura.utils.extensions.isMeteringAreaAFSupported
 import com.chaeyoon.haebit.obscura.utils.functions.getPreviewOutputSize
 import com.chaeyoon.haebit.obscura.utils.functions.logAEState
 import com.chaeyoon.haebit.obscura.utils.functions.logAFState
-import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
+import com.chaeyoon.haebit.obscura.ui.AutoFitSurfaceView
 import com.google.android.gms.common.util.concurrent.HandlerExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

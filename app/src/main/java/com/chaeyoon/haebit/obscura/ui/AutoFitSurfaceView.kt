@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view
+package com.chaeyoon.haebit.obscura.ui
 
 import android.content.Context
 import android.util.AttributeSet

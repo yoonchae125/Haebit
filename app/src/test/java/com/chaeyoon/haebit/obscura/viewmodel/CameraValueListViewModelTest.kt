@@ -2,9 +2,8 @@ package com.chaeyoon.haebit.obscura.viewmodel
 
 import com.chaeyoon.haebit.CoroutineDispatcherTestRule
 import com.chaeyoon.haebit.obscura.core.Camera
-import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
 import com.chaeyoon.haebit.obscura.utils.constants.FractionCameraValue
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
+import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Rule

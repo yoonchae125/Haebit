@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.scrollview
+package com.chaeyoon.haebit.obscura.ui
 
 import android.content.Context
 import android.util.DisplayMetrics

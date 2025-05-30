@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view
+package com.chaeyoon.haebit.obscura.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,10 +9,10 @@ import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
-import com.chaeyoon.haebit.obscura.view.model.CameraValueUIState
+import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
+import com.chaeyoon.haebit.obscura.ui.model.CameraValueUIState
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
-import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
+import com.chaeyoon.haebit.obscura.ui.CenterSmoothScroller
 import com.chaeyoon.haebit.util.VibrateManager
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

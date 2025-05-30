@@ -1,7 +1,5 @@
-package com.chaeyoon.haebit.obscura.view.model
+package com.chaeyoon.haebit.obscura.ui.model
 
-import android.content.Context
-import android.util.TypedValue
 import androidx.annotation.DrawableRes
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.obscura.core.LockState

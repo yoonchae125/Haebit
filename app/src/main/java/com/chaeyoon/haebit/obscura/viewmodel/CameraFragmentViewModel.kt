@@ -8,11 +8,11 @@ import com.chaeyoon.haebit.obscura.core.CameraImpl
 import com.chaeyoon.haebit.obscura.CameraFragment
 import com.chaeyoon.haebit.obscura.core.LockState
 import com.chaeyoon.haebit.obscura.utils.extensions.toTwoDecimalPlaces
-import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
+import com.chaeyoon.haebit.obscura.ui.model.LockRectUIState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
-import com.chaeyoon.haebit.obscura.view.model.Position
+import com.chaeyoon.haebit.obscura.ui.AutoFitSurfaceView
+import com.chaeyoon.haebit.obscura.ui.model.Position
 import kotlinx.coroutines.CoroutineScope
 
 /**

@@ -1,4 +1,4 @@
-package com.chaeyoon.haebit.obscura.view.animator
+package com.chaeyoon.haebit.obscura.ui.animator
 
 import android.animation.Animator
 import android.animation.ObjectAnimator

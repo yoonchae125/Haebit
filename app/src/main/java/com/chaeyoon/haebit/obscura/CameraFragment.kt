@@ -20,11 +20,11 @@ import com.chaeyoon.haebit.obscura.utils.constants.isoValues
 import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
-import com.chaeyoon.haebit.obscura.view.CameraValueListBinder
-import com.chaeyoon.haebit.obscura.view.animator.CenterValueAnimator
-import com.chaeyoon.haebit.obscura.view.model.CameraValueType
-import com.chaeyoon.haebit.obscura.view.model.LockRectUIState
-import com.chaeyoon.haebit.obscura.view.model.Position
+import com.chaeyoon.haebit.obscura.ui.CameraValueListBinder
+import com.chaeyoon.haebit.obscura.ui.animator.CenterValueAnimator
+import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
+import com.chaeyoon.haebit.obscura.ui.model.LockRectUIState
+import com.chaeyoon.haebit.obscura.ui.model.Position
 import com.chaeyoon.haebit.obscura.viewmodel.CameraFragmentViewModel
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
 import com.chaeyoon.haebit.permission.PermissionChecker

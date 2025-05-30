@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".obscura.CameraFragment">
 
-    <com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
+    <com.chaeyoon.haebit.obscura.ui.AutoFitSurfaceView
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

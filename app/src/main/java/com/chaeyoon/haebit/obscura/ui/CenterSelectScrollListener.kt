@@ -1,9 +1,9 @@
-package com.chaeyoon.haebit.obscura.view
+package com.chaeyoon.haebit.obscura.ui
 
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.chaeyoon.haebit.scrollview.CenterSmoothScroller
+import com.chaeyoon.haebit.obscura.ui.CenterSmoothScroller
 import kotlin.math.abs
 
 /**
