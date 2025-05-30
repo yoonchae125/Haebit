@@ -21,4 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Haebit"
 include(":app")
- 
+include(":lightmeter")
+include(":permission")
+include(":ui")
+include(":presentation")
+include(":obscura")

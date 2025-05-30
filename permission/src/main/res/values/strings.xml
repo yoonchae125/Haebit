@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alert_camera_permission_denied_title">Camera Access</string>
+    <string name="alert_camera_permission_denied_message">illumeter uses the camera to measure the exposure value and log it. Please allow camera access in Settings.</string>
+    <string name="alert_camera_permission_denied_button">Open Settings</string>
+</resources>
