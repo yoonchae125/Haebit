@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="alert_camera_permission_denied_title">카메라 권한</string>
-    <string name="alert_camera_permission_denied_message">해빛은 노출값(EV) 측정 및 로그 기록을 위해 카메라를 사용합니다. 설정을 열어 카메라 권한을 허용해주세요.</string>
-    <string name="alert_camera_permission_denied_button">설정 열기</string>
-</resources>

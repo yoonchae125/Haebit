@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.CameraFragment">
+    tools:context=".obscura.CameraFragment">
 
-    <com.chaeyoon.haebit.ui.view.AutoFitSurfaceView
+    <com.chaeyoon.haebit.obscura.view.AutoFitSurfaceView
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
