@@ -9,7 +9,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.chaeyoon.haebit.databinding.ActivityMainBinding
+import com.chaeyoon.haebit.ui.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

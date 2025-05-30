@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-internal inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
+inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
     state: Lifecycle.State = Lifecycle.State.STARTED,
     crossinline block: suspend CoroutineScope.() -> Unit
 ) {

@@ -1,20 +1,17 @@
 plugins {
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
 android {
-    namespace = "com.chaeyoon.haebit"
+    namespace = "com.chaeyoon.haebit.presentation"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.chaeyoon.haebit"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 4
-        versionName = "1.0"
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -26,10 +23,6 @@ android {
             )
         }
     }
-    buildFeatures {
-        viewBinding = true
-        buildConfig = true
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -40,19 +33,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":lightmeter"))
-    implementation(project(":permission"))
-    implementation(project(":ui"))
-    implementation(project(":presentation"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.play.services.basement)
-    implementation(libs.core.ktx)
 
     // test
     testImplementation(libs.junit)
