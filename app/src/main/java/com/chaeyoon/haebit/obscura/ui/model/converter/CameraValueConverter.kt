@@ -3,6 +3,7 @@ package com.chaeyoon.haebit.obscura.ui.model.converter
 import com.chaeyoon.haebit.obscura.model.CameraValue
 import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
 import com.chaeyoon.haebit.obscura.ui.model.CameraValueUIState
+import com.chaeyoon.haebit.obscura.utils.extensions.hasDecimalPart
 import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
 
 internal fun CameraValue.toUIState(
@@ -20,10 +21,12 @@ internal fun CameraValue.toUIState(
     disabled = disabled
 )
 
-
 internal fun CameraValue.getText(): String = when (type) {
-    CameraValueType.APERTURE ->
+    CameraValueType.APERTURE -> if (value.hasDecimalPart()) {
         "ƒ${value.toOneDecimalPlaces()}"
+    } else {
+        "ƒ${value.toInt()}"
+    }
 
     CameraValueType.SHUTTER_SPEED -> {
         if (isFraction) {
@@ -34,34 +37,4 @@ internal fun CameraValue.getText(): String = when (type) {
     }
 
     CameraValueType.ISO -> value.toInt().toString()
-}
-
-internal fun CameraValue.getPrefix(): String = when (type) {
-    CameraValueType.APERTURE -> "ƒ"
-
-    CameraValueType.SHUTTER_SPEED -> {
-        if (isFraction) {
-            "¹⁄"
-        } else {
-            ""
-        }
-    }
-
-    CameraValueType.ISO -> ""
-}
-
-internal fun CameraValue.getSuffix(): String = when (type) {
-    CameraValueType.APERTURE -> ""
-
-    CameraValueType.SHUTTER_SPEED -> "s"
-
-    CameraValueType.ISO -> ""
-}
-
-
-internal fun CameraValue.isDecimal(): Boolean {
-    return when (type) {
-        CameraValueType.APERTURE -> value % 1 != 0f
-        else -> false
-    }
 }

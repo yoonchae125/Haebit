@@ -8,10 +8,9 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.core.animation.addListener
 import com.chaeyoon.haebit.obscura.model.CameraValue
-import com.chaeyoon.haebit.obscura.ui.model.converter.getPrefix
-import com.chaeyoon.haebit.obscura.ui.model.converter.getSuffix
+import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
 import com.chaeyoon.haebit.obscura.ui.model.converter.getText
-import com.chaeyoon.haebit.obscura.ui.model.converter.isDecimal
+import com.chaeyoon.haebit.obscura.utils.extensions.hasDecimalPart
 import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
 
 object CenterValueAnimator {
@@ -125,6 +124,35 @@ object CenterValueAnimator {
             it.addUpdateListener { anim ->
                 targetView.text = getText(anim.animatedValue.toString())
             }
+        }
+    }
+
+    private fun CameraValue.getPrefix(): String = when (type) {
+        CameraValueType.APERTURE -> "ƒ"
+
+        CameraValueType.SHUTTER_SPEED -> {
+            if (isFraction) {
+                "¹⁄"
+            } else {
+                ""
+            }
+        }
+
+        CameraValueType.ISO -> ""
+    }
+
+    private fun CameraValue.getSuffix(): String = when (type) {
+        CameraValueType.APERTURE -> ""
+
+        CameraValueType.SHUTTER_SPEED -> "s"
+
+        CameraValueType.ISO -> ""
+    }
+
+    private fun CameraValue.isDecimal(): Boolean {
+        return when (type) {
+            CameraValueType.APERTURE -> value.hasDecimalPart()
+            else -> false
         }
     }
 }
