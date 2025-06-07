@@ -1,6 +1,6 @@
 package com.chaeyoon.haebit.obscura.utils.extensions
 
-import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
+import com.chaeyoon.haebit.obscura.model.CameraValue
 
 internal fun Float.nearest(among: List<CameraValue>): CameraValue {
     val closestCameraValue = among.minByOrNull { kotlin.math.abs(it.value - this) }
@@ -13,4 +13,12 @@ internal fun Float.toTwoDecimalPlaces(): Float {
 
 internal fun Float.toOneDecimalPlaces(): Float {
     return (this * 10).toInt() / 10f
+}
+
+internal fun Float.roundToDecimalPlaces(decimalPlaces: Int): Float {
+    return when (decimalPlaces) {
+        1 -> (this * 10).toInt() / 10f
+        2 -> (this * 100).toInt() / 100f
+        else -> this
+    }
 }

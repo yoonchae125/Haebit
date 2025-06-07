@@ -6,13 +6,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeyoon.haebit.R
-import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
+import com.chaeyoon.haebit.obscura.model.CameraValue
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
 import com.chaeyoon.haebit.obscura.ui.model.CameraValueUIState
 import com.chaeyoon.haebit.obscura.viewmodel.CameraValueListViewModel
-import com.chaeyoon.haebit.obscura.ui.CenterSmoothScroller
+import com.chaeyoon.haebit.obscura.ui.model.converter.toUIState
 import com.chaeyoon.haebit.util.VibrateManager
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -62,8 +62,7 @@ class CameraValueListBinder(
         valueList.map {
             val isSelected = userCameraValueFlow.value == it
             val disabled = viewModel.unSelectableValueTypeFlow.value == type
-            CameraValueUIState(
-                value = it,
+            it.toUIState(
                 isSelected = isSelected,
                 disabled = disabled
             )

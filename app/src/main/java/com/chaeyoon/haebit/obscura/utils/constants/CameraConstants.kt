@@ -1,169 +1,160 @@
 package com.chaeyoon.haebit.obscura.utils.constants
 
-import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
+import com.chaeyoon.haebit.obscura.model.CameraValue
 import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
 
-internal val apertureValues = listOf(
-    NormalCameraValue(type = CameraValueType.APERTURE, 1f, "ƒ"),
-    NormalCameraValue(type = CameraValueType.APERTURE, 1.4f, "ƒ", decimal = true),
-    NormalCameraValue(type = CameraValueType.APERTURE, 2f, "ƒ"),
-    NormalCameraValue(type = CameraValueType.APERTURE, 2.8f, "ƒ", decimal = true),
-    NormalCameraValue(type = CameraValueType.APERTURE, 4f, "ƒ"),
-    NormalCameraValue(type = CameraValueType.APERTURE, 5.6f, "ƒ", decimal = true),
-    NormalCameraValue(type = CameraValueType.APERTURE, 8f, "ƒ"),
-    NormalCameraValue(type = CameraValueType.APERTURE, 11f, "ƒ"),
-    NormalCameraValue(type = CameraValueType.APERTURE, 16f, "ƒ"),
-    NormalCameraValue(type = CameraValueType.APERTURE, 22f, "ƒ")
+//"¹⁄"
+//"ƒ"
+internal val initialApertureValues = listOf(
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 1f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 1.4f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 2f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 2.8f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 4f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 5.6f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 8f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 11f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 16f
+    ),
+    CameraValue(
+        type = CameraValueType.APERTURE,
+        value = 22f
+    )
 )
 
-internal val shutterSpeedValues = listOf(
-    FractionCameraValue(
+internal val initialShutterSpeedValues = listOf(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 8000f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 8000
+        value = 8000f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 4000f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 4000
+        value = 4000f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 2000f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 2000
+        value = 2000f,
+        isFraction = true
+
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 1000f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 1000
+        value = 1000f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 500f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 500
+        value = 500f,
+        isFraction = true
+
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 250f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 250
+        value = 250f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 125f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 125
+        value = 125f,
+        isFraction = true
+
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 60f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 60
+        value = 60f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 30f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 30
+        value = 30f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 15f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 15
+        value = 15f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 8f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 8
+        value = 8f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 4f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 4
+        value = 4f,
+        isFraction = true
     ),
-    FractionCameraValue(
+    CameraValue(
         type = CameraValueType.SHUTTER_SPEED,
-        1 / 2f,
-        "¹⁄",
-        suffix = "s",
-        denominator = 2
+        value = 2f,
+        isFraction = true
     ),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 1f, suffix = "s"),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 2f, suffix = "s"),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 4f, suffix = "s"),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 8f, suffix = "s"),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 16f, suffix = "s"),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 30f, suffix = "s"),
-    NormalCameraValue(type = CameraValueType.SHUTTER_SPEED, 60f, suffix = "s")
+    CameraValue(
+        type = CameraValueType.SHUTTER_SPEED,
+        value = 1f
+    ),
+    CameraValue(
+        type = CameraValueType.SHUTTER_SPEED,
+        value = 2f
+    ),
+    CameraValue(
+        type = CameraValueType.SHUTTER_SPEED,
+        value = 4f
+    ),
+    CameraValue(
+        type = CameraValueType.SHUTTER_SPEED,
+        value = 8f
+    ),
+    CameraValue(
+        type = CameraValueType.SHUTTER_SPEED,
+        value = 16f
+    ),
+    CameraValue(
+        type = CameraValueType.SHUTTER_SPEED,
+        value = 30f
+    ),
+    CameraValue(type = CameraValueType.SHUTTER_SPEED,
+        value = 60f
+    )
 )
 
-internal val isoValues = listOf(
-    NormalCameraValue(type = CameraValueType.ISO, 25f),
-    NormalCameraValue(type = CameraValueType.ISO, 100f),
-    NormalCameraValue(type = CameraValueType.ISO, 200f),
-    NormalCameraValue(type = CameraValueType.ISO, 400f),
-    NormalCameraValue(type = CameraValueType.ISO, 800f),
-    NormalCameraValue(type = CameraValueType.ISO, 1600f),
-    NormalCameraValue(type = CameraValueType.ISO, 3200f),
-    NormalCameraValue(type = CameraValueType.ISO, 12800f),
-    NormalCameraValue(type = CameraValueType.ISO, 25600f),
-    NormalCameraValue(type = CameraValueType.ISO, 51200f)
+internal val initialIsoValues = listOf(
+    CameraValue(type = CameraValueType.ISO, value = 25f),
+    CameraValue(type = CameraValueType.ISO, value = 100f),
+    CameraValue(type = CameraValueType.ISO, 200f),
+    CameraValue(type = CameraValueType.ISO, value = 400f),
+    CameraValue(type = CameraValueType.ISO, value = 800f),
+    CameraValue(type = CameraValueType.ISO, value = 1600f),
+    CameraValue(type = CameraValueType.ISO, value = 3200f),
+    CameraValue(type = CameraValueType.ISO, value = 12800f),
+    CameraValue(type = CameraValueType.ISO, value = 25600f),
+    CameraValue(type = CameraValueType.ISO, value = 51200f)
 )
-
-interface CameraValue {
-    val type: CameraValueType
-    val value: Float
-    val prefix: String
-    val suffix: String
-    val decimal: Boolean
-    fun getText(forCenter: Boolean = false): String {
-        val number = if (decimal) {
-            value.toOneDecimalPlaces()
-        } else {
-            value.toInt()
-        }
-        return prefix + number + suffix
-    }
-}
-
-data class NormalCameraValue(
-    override val type: CameraValueType,
-    override val value: Float,
-    override val prefix: String = "",
-    override val suffix: String = "",
-    override val decimal: Boolean = false
-) : CameraValue
-
-data class FractionCameraValue(
-    override val type: CameraValueType,
-    override val value: Float,
-    override val prefix: String = "",
-    override val suffix: String = "",
-    override val decimal: Boolean = false,
-    val denominator: Int = 1
-) : CameraValue {
-    override fun getText(forCenter: Boolean): String {
-        val space = if (forCenter) " " else ""
-        return prefix + space + denominator + suffix
-    }
-}
