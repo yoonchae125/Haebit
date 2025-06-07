@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.chaeyoon.haebit.lightmeter.LightMeterCalculator
 import com.chaeyoon.haebit.obscura.core.Camera
 import com.chaeyoon.haebit.obscura.core.CameraImpl
-import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
-import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
-import com.chaeyoon.haebit.obscura.utils.constants.isoValues
-import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
+import com.chaeyoon.haebit.obscura.model.CameraValue
+import com.chaeyoon.haebit.obscura.utils.constants.initialApertureValues
+import com.chaeyoon.haebit.obscura.utils.constants.initialIsoValues
+import com.chaeyoon.haebit.obscura.utils.constants.initialShutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.nearest
 import com.chaeyoon.haebit.obscura.ui.CameraValueListBinder
@@ -36,16 +36,16 @@ class CameraValueListViewModel(
     private val exposureValueFlow: StateFlow<Float> = camera.exposureValueFlow
 
     private val mutableUserIsoFlow = MutableStateFlow(
-        isoFlow.value.nearest(isoValues)
+        isoFlow.value.nearest(initialIsoValues)
     )
     private val mutableUserShutterSpeedFlow = MutableStateFlow(
-        shutterSpeedFlow.value.nearest(shutterSpeedValues)
+        shutterSpeedFlow.value.nearest(initialShutterSpeedValues)
     )
     private val mutableUserApertureFlow = MutableStateFlow(
-        aperture.nearest(apertureValues)
+        aperture.nearest(initialApertureValues)
     )
 
-    private val mutableUnSelectableCameraValueTextFlow = MutableStateFlow(isoFlow.value.nearest(isoValues))
+    private val mutableUnSelectableCameraValueTextFlow = MutableStateFlow(isoFlow.value.nearest(initialIsoValues))
     val unSelectableCameraValueTextFlow: StateFlow<CameraValue> =
         mutableUnSelectableCameraValueTextFlow.asStateFlow()
 
@@ -86,19 +86,19 @@ class CameraValueListViewModel(
                 exposureValueFlow.value,
                 mutableUserIsoFlow.value.value,
                 mutableUserShutterSpeedFlow.value.value
-            ).nearest(apertureValues)
+            ).nearest(initialApertureValues)
 
             CameraValueType.ISO -> lightMeterCalculator.calculateIsoValue(
                 exposureValueFlow.value,
                 mutableUserShutterSpeedFlow.value.value,
                 mutableUserApertureFlow.value.value
-            ).nearest(isoValues)
+            ).nearest(initialIsoValues)
 
             CameraValueType.SHUTTER_SPEED -> lightMeterCalculator.calculateShutterSpeedValue(
                 exposureValueFlow.value,
                 mutableUserIsoFlow.value.value,
                 mutableUserApertureFlow.value.value
-            ).nearest(shutterSpeedValues)
+            ).nearest(initialShutterSpeedValues)
         }
         updateUnSelectableCameraValue(value)
         getUserCameraValueMutableFlow(unSelectableType).update { value }

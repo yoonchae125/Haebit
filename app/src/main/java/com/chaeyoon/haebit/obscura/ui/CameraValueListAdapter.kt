@@ -69,7 +69,7 @@ class CameraValueListAdapter(
         fun bindTextView(uiState: CameraValueUIState, typeface: Typeface) {
             binding.valueText.setTextColor(getTextColor(uiState))
             binding.valueText.typeface = typeface
-            binding.valueText.text = uiState.value.getText()
+            binding.valueText.text = uiState.text
             binding.root.setOnClickListener { onClick() }
         }
 

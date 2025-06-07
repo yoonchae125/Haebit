@@ -7,9 +7,10 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.core.animation.addListener
-import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
-import com.chaeyoon.haebit.obscura.utils.constants.FractionCameraValue
-import com.chaeyoon.haebit.obscura.utils.constants.NormalCameraValue
+import com.chaeyoon.haebit.obscura.model.CameraValue
+import com.chaeyoon.haebit.obscura.ui.model.CameraValueType
+import com.chaeyoon.haebit.obscura.ui.model.converter.getText
+import com.chaeyoon.haebit.obscura.utils.extensions.hasDecimalPart
 import com.chaeyoon.haebit.obscura.utils.extensions.toOneDecimalPlaces
 
 object CenterValueAnimator {
@@ -19,32 +20,32 @@ object CenterValueAnimator {
         targetCameraValue: CameraValue
     ): Animator {
         targetView.clearAnimation()
-        targetView.text = currentCameraValue?.getText(true)
+        targetView.text = currentCameraValue?.getText()
 
         if (currentCameraValue?.type != targetCameraValue.type) {
             return fadeAnimator(
                 targetView = targetView,
-                text = targetCameraValue.getText(true)
+                text = targetCameraValue.getText()
             )
         }
 
         val getText: (String) -> String = { animValue ->
-            val space = if (targetCameraValue is FractionCameraValue) " " else ""
-            targetCameraValue.prefix + space + animValue + targetCameraValue.suffix
+            val space = if (targetCameraValue.isFraction) " " else ""
+            targetCameraValue.getPrefix() + space + animValue + targetCameraValue.getSuffix()
         }
 
         return when {
-            currentCameraValue is FractionCameraValue && targetCameraValue is FractionCameraValue -> {
+            currentCameraValue.isFraction && targetCameraValue.isFraction -> {
                 intValueAnimator(
                     targetView = targetView,
-                    from = currentCameraValue.denominator,
-                    to = targetCameraValue.denominator,
+                    from = currentCameraValue.value.toInt(),
+                    to = targetCameraValue.value.toInt(),
                     getText = getText
                 )
             }
 
-            currentCameraValue is NormalCameraValue && targetCameraValue is NormalCameraValue -> {
-                if (!currentCameraValue.decimal && !targetCameraValue.decimal) {
+            !currentCameraValue.isFraction && !targetCameraValue.isFraction -> {
+                if (!currentCameraValue.isDecimal() && !targetCameraValue.isDecimal()) {
                     intValueAnimator(
                         targetView = targetView,
                         from = currentCameraValue.value.toInt(),
@@ -52,7 +53,7 @@ object CenterValueAnimator {
                         getText = getText
                     )
                 } else {
-                    if (targetCameraValue.decimal) {
+                    if (targetCameraValue.isDecimal()) {
                         floatValueAnimator(
                             targetView = targetView,
                             from = currentCameraValue.value,
@@ -70,16 +71,11 @@ object CenterValueAnimator {
                 }
             }
 
-            currentCameraValue is NormalCameraValue && targetCameraValue is FractionCameraValue ||
-                    currentCameraValue is FractionCameraValue && targetCameraValue is NormalCameraValue -> {
+            else -> {
                 fadeAnimator(
                     targetView = targetView,
-                    text = targetCameraValue.getText(true)
+                    text = targetCameraValue.getText()
                 )
-            }
-
-            else -> {
-                error("not available case")
             }
         }
     }
@@ -128,6 +124,35 @@ object CenterValueAnimator {
             it.addUpdateListener { anim ->
                 targetView.text = getText(anim.animatedValue.toString())
             }
+        }
+    }
+
+    private fun CameraValue.getPrefix(): String = when (type) {
+        CameraValueType.APERTURE -> "ƒ"
+
+        CameraValueType.SHUTTER_SPEED -> {
+            if (isFraction) {
+                "¹⁄"
+            } else {
+                ""
+            }
+        }
+
+        CameraValueType.ISO -> ""
+    }
+
+    private fun CameraValue.getSuffix(): String = when (type) {
+        CameraValueType.APERTURE -> ""
+
+        CameraValueType.SHUTTER_SPEED -> "s"
+
+        CameraValueType.ISO -> ""
+    }
+
+    private fun CameraValue.isDecimal(): Boolean {
+        return when (type) {
+            CameraValueType.APERTURE -> value.hasDecimalPart()
+            else -> false
         }
     }
 }

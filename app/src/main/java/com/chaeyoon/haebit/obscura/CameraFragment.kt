@@ -14,10 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import com.chaeyoon.haebit.BuildConfig
 import com.chaeyoon.haebit.R
 import com.chaeyoon.haebit.databinding.FragmentCameraBinding
-import com.chaeyoon.haebit.obscura.utils.constants.CameraValue
-import com.chaeyoon.haebit.obscura.utils.constants.apertureValues
-import com.chaeyoon.haebit.obscura.utils.constants.isoValues
-import com.chaeyoon.haebit.obscura.utils.constants.shutterSpeedValues
+import com.chaeyoon.haebit.obscura.model.CameraValue
+import com.chaeyoon.haebit.obscura.utils.constants.initialApertureValues
+import com.chaeyoon.haebit.obscura.utils.constants.initialIsoValues
+import com.chaeyoon.haebit.obscura.utils.constants.initialShutterSpeedValues
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndCollect
 import com.chaeyoon.haebit.obscura.utils.extensions.launchAndRepeatOnLifecycle
 import com.chaeyoon.haebit.obscura.ui.CameraValueListBinder
@@ -144,7 +144,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         CameraValueListBinder(
             requireContext(),
             viewLifecycleOwner,
-            binding.apertureList, apertureValues,
+            binding.apertureList,
+            initialApertureValues,
             CameraValueType.APERTURE,
             binderViewModel
         )
@@ -152,7 +153,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             requireContext(),
             viewLifecycleOwner,
             binding.shutterSpeedList,
-            shutterSpeedValues,
+            initialShutterSpeedValues,
             CameraValueType.SHUTTER_SPEED,
             binderViewModel
         )
@@ -160,7 +161,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             requireContext(),
             viewLifecycleOwner,
             binding.isoList,
-            isoValues,
+            initialIsoValues,
             CameraValueType.ISO,
             binderViewModel
         )
